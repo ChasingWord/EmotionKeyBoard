@@ -1,4 +1,4 @@
-package com.example.testinput.keyboard;
+package com.example.testinput.keyboard.util;
 
 import android.annotation.TargetApi;
 import android.app.Activity;

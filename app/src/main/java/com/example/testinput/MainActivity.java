@@ -18,12 +18,15 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.example.testinput.adapter.recycleradaper.BaseRecylerAdapter;
-import com.example.testinput.keyboard.EmotionEntity;
+import com.example.testinput.decoration.HorizontalDividerItemDecoration;
+import com.example.testinput.decoration.VerticalDividerItemDecoration;
+import com.example.testinput.keyboard.entity.EmotionEntity;
 import com.example.testinput.keyboard.EmotionFragment;
-import com.example.testinput.keyboard.EmotionKeyboardManager;
+import com.example.testinput.keyboard.util.EmotionKeyboardManager;
 import com.example.testinput.keyboard.EmotionTitleAdapter;
 import com.example.testinput.keyboard.EmotionVpIndicator;
 import com.example.testinput.keyboard.EmotionVpAdapter;
+import com.example.testinput.keyboard.util.EmotionUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         mRcvEmotionTitle.setLayoutManager(linearLayoutManager);
+        mRcvEmotionTitle.addItemDecoration(new VerticalDividerItemDecoration.Builder(this).color(R.color.colorPrimary).build());
         mRcvEmotionTitle.setAdapter(mEmotionTitleAdapter);
         mEmotionTitleAdapter.setItemClickListener(new BaseRecylerAdapter.ItemClickListener() {
             @Override
@@ -93,24 +97,26 @@ public class MainActivity extends AppCompatActivity {
         mVpFragments = new ArrayList<>();
         emotionEntities = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            HashMap<String, Integer> emotions = new HashMap<>();
-            emotions.put("ha", R.mipmap.ic_launcher);
-            EmotionEntity emotionEntity = new EmotionEntity("theme1", emotions, 2, true);
+            EmotionEntity emotionEntity = new EmotionEntity("theme1", EmotionUtil.EMOTION_CLASSIC_MAP, 2, true);
             EmotionFragment instance = EmotionFragment.getInstance(emotionEntity);
             mVpFragments.add(instance);
             emotionEntities.add(emotionEntity);
         }
         mEmotionTitles.add("theme1");
         for (int i = 0; i < 3; i++) {
-            HashMap<String, Integer> emotions = new HashMap<>();
-            emotions.put("ha1", R.mipmap.ic_launcher);
-            emotions.put("ha2", R.mipmap.ic_launcher);
-            EmotionEntity emotionEntity = new EmotionEntity("theme2", emotions, 3, false);
+            EmotionEntity emotionEntity = new EmotionEntity("theme2", EmotionUtil.EMOTION_CLASSIC_MAP, 3, false);
             EmotionFragment instance = EmotionFragment.getInstance(emotionEntity);
             mVpFragments.add(instance);
             emotionEntities.add(emotionEntity);
         }
         mEmotionTitles.add("theme2");
+        for (int i = 0; i < 3; i++) {
+            EmotionEntity emotionEntity = new EmotionEntity("theme3", EmotionUtil.EMOTION_CLASSIC_MAP, 3, false);
+            EmotionFragment instance = EmotionFragment.getInstance(emotionEntity);
+            mVpFragments.add(instance);
+            emotionEntities.add(emotionEntity);
+        }
+        mEmotionTitles.add("theme3");
         mEmotionVpAdapter = new EmotionVpAdapter(getFragmentManager(), mVpFragments);
         mVpEmotion.setAdapter(mEmotionVpAdapter);
         mVpIndicator.bindViewPager(mVpEmotion, emotionEntities);

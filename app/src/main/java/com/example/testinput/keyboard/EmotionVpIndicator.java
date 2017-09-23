@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.widget.ImageView;
@@ -11,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.example.testinput.R;
+import com.example.testinput.keyboard.entity.EmotionEntity;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -54,10 +56,10 @@ public class EmotionVpIndicator extends LinearLayout {
         }
 
         if (mDrawableNormal == null) {
-            mDrawableNormal = getResources().getDrawable(R.mipmap.indicator_point_nomal);
+            mDrawableNormal = ContextCompat.getDrawable(getContext(), R.mipmap.indicator_point_nomal);
         }
         if (mDrawableSelect == null) {
-            mDrawableSelect = getResources().getDrawable(R.mipmap.indicator_point_select);
+            mDrawableSelect = ContextCompat.getDrawable(getContext(), R.mipmap.indicator_point_select);
         }
     }
 
@@ -101,10 +103,10 @@ public class EmotionVpIndicator extends LinearLayout {
 
         try {
             //设置ViewPager的页面切换速度为0，避免间隔较大的页面跳转产生问题
-            Field  mScroller = ViewPager.class.getDeclaredField("mScroller");
+            Field mScroller = ViewPager.class.getDeclaredField("mScroller");
             mScroller.setAccessible(true);
-            FixedSpeedScroller scroller = new FixedSpeedScroller( mViewPager.getContext( ) );
-            mScroller.set( mViewPager, scroller);
+            FixedSpeedScroller scroller = new FixedSpeedScroller(mViewPager.getContext());
+            mScroller.set(mViewPager, scroller);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -114,7 +116,6 @@ public class EmotionVpIndicator extends LinearLayout {
      * 判断是否需要更新指示器数量
      *
      * @param position 切换的下标
-     * @return
      */
     private boolean isNeedUpdate(int position) {
         EmotionEntity preEntity = mEmotionEntities.get(mVpPreSelectPosition);
