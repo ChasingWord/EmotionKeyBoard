@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="EmoticonsIndicatorView">
+        <attr name="indicatorNormal" format="reference" />
+        <attr name="indicatorSelect" format="reference" />
+        <attr name="indicatorSide" format="dimension"/>
+        <attr name="indicatorMarginTop" format="dimension"/>
+        <attr name="indicatorMarginLeft" format="dimension"/>
+        <attr name="indicatorMarginRight" format="dimension"/>
+        <attr name="indicatorMarginBottom" format="dimension"/>
+    </declare-styleable>
+</resources>
