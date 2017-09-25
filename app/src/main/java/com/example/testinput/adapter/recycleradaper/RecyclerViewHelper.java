@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.util.Linkify;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.widget.Adapter;
 import android.widget.AdapterView;
@@ -230,4 +231,10 @@ public class RecyclerViewHelper {
 		return position;
 	}
 
+	public void setViewHeight(int viewId, int viewHeight) {
+		View view = retrieveView(viewId);
+		ViewGroup.LayoutParams lp = view.getLayoutParams();
+		lp.height = viewHeight;
+		view.setLayoutParams(lp);
+	}
 }

@@ -3,7 +3,7 @@ package com.example.testinput.adapter.recycleradaper;
 import android.content.Context;
 import android.view.View;
 
-public abstract class RecyclerQuickAdapter<T> extends BaseRecylerAdapter<T,RecyclerViewHelper> {
+public abstract class RecyclerQuickAdapter<T> extends BaseRecyclerAdapter<T,RecyclerViewHelper> {
 
     public RecyclerQuickAdapter(Context context, /*BaseRecylerViewHolder recylerViewHolderHelper,*/int layoutId) {
         super(context, /*recylerViewHolderHelper*/layoutId, null);

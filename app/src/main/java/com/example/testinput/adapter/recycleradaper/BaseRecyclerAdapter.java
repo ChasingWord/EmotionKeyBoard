@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class BaseRecylerAdapter<T, H extends RecyclerViewHelper> extends RecyclerView.Adapter<ViewHolder> {
+public abstract class BaseRecyclerAdapter<T, H extends RecyclerViewHelper> extends RecyclerView.Adapter<ViewHolder> {
 
     protected List<T> datas;
     protected Context context;
@@ -40,7 +40,7 @@ public abstract class BaseRecylerAdapter<T, H extends RecyclerViewHelper> extend
     }
 
 
-    public BaseRecylerAdapter(Context context, int layoutId/*BaseRecylerViewHolder recylerViewHolderHelper*/, List<T> datas) {
+    public BaseRecyclerAdapter(Context context, int layoutId/*BaseRecylerViewHolder recylerViewHolderHelper*/, List<T> datas) {
         this.context = context;
         this.datas = datas == null ? new ArrayList<T>() : new ArrayList<T>(datas);
 //        this.recylerViewHolderHelper = recylerViewHolderHelper;
@@ -48,7 +48,7 @@ public abstract class BaseRecylerAdapter<T, H extends RecyclerViewHelper> extend
     }
 
 
-    public BaseRecylerAdapter(Context context, List<T> datas, BaseRecyclerMultitemTypeSupport baseRecyclerMultitemTypeSupport) {
+    public BaseRecyclerAdapter(Context context, List<T> datas, BaseRecyclerMultitemTypeSupport baseRecyclerMultitemTypeSupport) {
         this.context = context;
         this.datas = datas == null ? new ArrayList<T>() : new ArrayList<T>(datas);
         this.baseRecyclerMultitemTypeSupport = baseRecyclerMultitemTypeSupport;

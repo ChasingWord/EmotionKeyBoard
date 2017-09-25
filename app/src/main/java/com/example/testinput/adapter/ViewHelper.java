@@ -75,6 +75,22 @@ public class ViewHelper {
 		return (T) view;
 	}
 
+	public ViewHelper setViewHeight(int viewId, int height){
+		View view = retrieveView(viewId);
+		ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+		layoutParams.height = height;
+		view.setLayoutParams(layoutParams);
+		return this;
+	}
+
+	public ViewHelper setViewWidth(int viewId, int width){
+		View view = retrieveView(viewId);
+		ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+		layoutParams.width = width;
+		view.setLayoutParams(layoutParams);
+		return this;
+	}
+
 	public ViewHelper setText(int viewId, String value) {
 		TextView view = retrieveView(viewId);
 		view.setText(value);

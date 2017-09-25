@@ -12,7 +12,7 @@ public class EmotionEntity implements Serializable {
     private HashMap<String, Integer> mEmotionMap;
     private boolean isEmotionIcon;//是否是表情，表情则发送在EditText上，图片则直接显示在对话框
 
-    public EmotionEntity(String theme,HashMap<String, Integer> emotionMap, int themeChildCount, boolean isEmotionIcon){
+    public EmotionEntity(String theme, HashMap<String, Integer> emotionMap, int themeChildCount, boolean isEmotionIcon){
         mEmotionMap = new HashMap<>();
         mTheme = theme;
         mEmotionMap.putAll(emotionMap);
