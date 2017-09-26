@@ -30,11 +30,11 @@ public class EmotionFragment extends Fragment {
     public static final String INTENT_DATA = "data";
 
     //表情的行列数
-    private static final int COLUMN_COUNT_EMOTION = 7;
-    private static final int ROW_COUNT_EMOTION = 3;
+    public static final int COLUMN_COUNT_EMOTION = 7;
+    public static final int ROW_COUNT_EMOTION = 3;
     //图片的行列数
-    private static final int COLUMN_COUNT_IMG = 3;
-    private static final int ROW_COUNT_IMG = 2;
+    public static final int COLUMN_COUNT_IMG = 3;
+    public static final int ROW_COUNT_IMG = 2;
 
     private View mRootView;
     private GridView mGvEmotion;
@@ -79,7 +79,7 @@ public class EmotionFragment extends Fragment {
     }
 
     private void initView(View rootView) {
-        mGvEmotion = rootView.findViewById(R.id.grid_emotion);
+        mGvEmotion = (GridView) rootView.findViewById(R.id.grid_emotion);
         if (mEmotionEntity.isEmotionIcon()) {
             mGvEmotion.setNumColumns(COLUMN_COUNT_EMOTION);
             mPageTotalCount *= COLUMN_COUNT_EMOTION;
@@ -149,7 +149,7 @@ public class EmotionFragment extends Fragment {
                     removeMessages(HANDLER_DELETE_EMOTION);
                     if (!isDeleteEmotion) return;
                     mEtInput.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL));
-                    sendEmptyMessageDelayed(HANDLER_DELETE_EMOTION, 200);
+                    sendEmptyMessageDelayed(HANDLER_DELETE_EMOTION, 100);
                     break;
             }
         }
@@ -194,6 +194,6 @@ public class EmotionFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mEtInput = getActivity().findViewById(R.id.et_input);
+        mEtInput = (EditText) getActivity().findViewById(R.id.et_input);
     }
 }

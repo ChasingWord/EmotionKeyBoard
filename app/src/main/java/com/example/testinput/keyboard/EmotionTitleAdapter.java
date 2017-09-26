@@ -20,6 +20,7 @@ public class EmotionTitleAdapter extends RecyclerQuickAdapter<String> {
     }
 
     public void setSelectPosition(int position){
+        if (mSelectPosition == position) return;
         int tempPosition = mSelectPosition;
         mSelectPosition = position;
         notifyItemChanged(tempPosition);

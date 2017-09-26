@@ -54,7 +54,7 @@ public class EmotionUtil {
         }
 
         EMOTION_CLASSIC_MAP3 = new HashMap<>();
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < 44; i++) {
             EMOTION_CLASSIC_MAP3.put("[ha" + i + "]", R.mipmap.ic_launcher);
         }
     }

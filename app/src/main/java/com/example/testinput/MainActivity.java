@@ -28,7 +28,10 @@ import com.example.testinput.keyboard.EmotionVpAdapter;
 import com.example.testinput.keyboard.util.EmotionUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -56,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         mRlContent = (RelativeLayout) findViewById(R.id.rl_content);
         mIbChangeEmotion = (ImageButton) findViewById(R.id.ib);
         mEtInput = (EditText) findViewById(R.id.et_input);
-        showSoftInput();
+
         initRcvEmotionTitle();
         initVp();
 
@@ -96,36 +99,79 @@ public class MainActivity extends AppCompatActivity {
         mVpFragments = new ArrayList<>();
         emotionEntities = new ArrayList<>();
 
-        EmotionEntity theme1 = new EmotionEntity("theme1", EmotionUtil.getEmotionMap(EmotionUtil.EMOTION_CLASSIC_TYPE1), 1, true);
-        EmotionFragment instance1 = EmotionFragment.getInstance(theme1);
-        mVpFragments.add(instance1);
-        emotionEntities.add(theme1);
+        createFragmentFromMap(true, "theme1", EmotionUtil.getEmotionMap(EmotionUtil.EMOTION_CLASSIC_TYPE1));
         mEmotionTitles.add("theme1");
 
-        EmotionEntity theme2 = new EmotionEntity("theme2", EmotionUtil.getEmotionMap(EmotionUtil.EMOTION_CLASSIC_TYPE2), 1, false);
-        EmotionFragment instance2 = EmotionFragment.getInstance(theme2);
-        mVpFragments.add(instance2);
-        emotionEntities.add(theme2);
+        createFragmentFromMap(false, "theme2", EmotionUtil.getEmotionMap(EmotionUtil.EMOTION_CLASSIC_TYPE2));
         mEmotionTitles.add("theme2");
 
-        for (int i = 0; i < 3; i++) {
-            EmotionEntity theme3 = new EmotionEntity("theme3", EmotionUtil.getEmotionMap(EmotionUtil.EMOTION_CLASSIC_TYPE3), 3, true);
-            EmotionFragment instance3 = EmotionFragment.getInstance(theme3);
-            mVpFragments.add(instance3);
-            emotionEntities.add(theme3);
-        }
+        createFragmentFromMap(true, "theme3", EmotionUtil.getEmotionMap(EmotionUtil.EMOTION_CLASSIC_TYPE3));
         mEmotionTitles.add("theme3");
 
         mEmotionVpAdapter = new EmotionVpAdapter(getFragmentManager(), mVpFragments);
         mVpEmotion.setAdapter(mEmotionVpAdapter);
-        mVpIndicator.bindViewPager(mVpEmotion, emotionEntities);
+        mVpIndicator.bindViewPager(mVpEmotion, emotionEntities, mEmotionTitles);
         mEmotionTitleAdapter.addAll(mEmotionTitles);
+
+        mVpEmotion.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                mEmotionTitleAdapter.setSelectPosition(mVpIndicator.getCurrentTitlePosition());
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+    }
+
+    /**
+     * 根据表情集合Map进行创建EmotionFragment
+     *
+     * @param isEmotion  是否是表情 true为表情 false为图片
+     * @param title      表情标签主题
+     * @param emotionMap 表情集合
+     */
+    private void createFragmentFromMap(boolean isEmotion, String title, HashMap<String, Integer> emotionMap) {
+        int emotionSize, childPageCount;
+        if (isEmotion) {
+            emotionSize = EmotionFragment.COLUMN_COUNT_EMOTION * EmotionFragment.ROW_COUNT_EMOTION - 1;
+        } else {
+            emotionSize = EmotionFragment.COLUMN_COUNT_IMG * EmotionFragment.ROW_COUNT_IMG;
+        }
+        if (emotionMap.size() % emotionSize == 0) {
+            childPageCount = emotionMap.size() / emotionSize;
+        } else {
+            childPageCount = emotionMap.size() / emotionSize + 1;
+        }
+        EmotionEntity entity = null;
+        Set<Map.Entry<String, Integer>> entries = emotionMap.entrySet();
+        Map.Entry<String, Integer>[] emotionArray = new Map.Entry[entries.size()];
+        entries.toArray(emotionArray);
+        for (int i = 0; i < emotionArray.length; i++) {
+            if (i % emotionSize == 0) {
+                HashMap<String, Integer> childMap = new HashMap<>();
+                entity = new EmotionEntity(title, childPageCount, isEmotion);
+                entity.setEmotionMap(childMap);
+                EmotionFragment instance3 = EmotionFragment.getInstance(entity);
+                mVpFragments.add(instance3);
+                emotionEntities.add(entity);
+            }
+            assert entity != null;
+            entity.getEmotionMap().put(emotionArray[i].getKey(), emotionArray[i].getValue());
+        }
     }
 
     private void showSoftInput() {
         mEtInput.requestFocus();
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(mEtInput, InputMethodManager.SHOW_IMPLICIT);
+        imm.showSoftInput(mEtInput, InputMethodManager.SHOW_FORCED);
     }
 
     private void hideSoftInput() {

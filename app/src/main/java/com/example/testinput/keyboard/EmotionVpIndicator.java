@@ -33,6 +33,9 @@ public class EmotionVpIndicator extends LinearLayout {
     private int mVpPreSelectPosition = 0;
     private int mIndicatorSelectPosition = 0;
 
+    private List<String> mAllTitle;
+    private String mCurrentTitle;
+
     public EmotionVpIndicator(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
@@ -74,16 +77,16 @@ public class EmotionVpIndicator extends LinearLayout {
     /**
      * 绑定目标ViewPager及数据源
      */
-    public void bindViewPager(ViewPager viewPager, List<EmotionEntity> emotionEntities) {
+    public void bindViewPager(ViewPager viewPager, final List<EmotionEntity> emotionEntities, List<String> allTitle) {
         mEmotionEntities = emotionEntities;
-        updateIndicatorViews(0);
         mViewPager = viewPager;
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
-            }
+        mAllTitle = new ArrayList<>();
+        mAllTitle.addAll(allTitle);
 
+        updateIndicatorViews(0);
+        mCurrentTitle = emotionEntities.get(0).getTheme();
+        viewPager.addOnPageChangeListener(new OnPageChangeWithoutColorListener(viewPager) {
             @Override
             public void onPageSelected(int position) {
                 if (position == mVpPreSelectPosition) return;
@@ -93,11 +96,7 @@ public class EmotionVpIndicator extends LinearLayout {
                     refreshIndicatorViews(position);
                 }
                 mVpPreSelectPosition = position;
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
+                mCurrentTitle = mEmotionEntities.get(position).getTheme();
             }
         });
 
@@ -192,5 +191,22 @@ public class EmotionVpIndicator extends LinearLayout {
         }
         updateIndicatorViews(mVpPreSelectPosition);
         mViewPager.setCurrentItem(mVpPreSelectPosition);
+    }
+
+    /**
+     * 获取当前的表情标签主题
+     */
+    public String getCurrentTitle(){
+        return mCurrentTitle;
+    }
+
+    /**
+     * 获取当前的表情标签主题的索引
+     */
+    public int getCurrentTitlePosition(){
+        for (int i = 0;i<mAllTitle.size();i++){
+            if (mAllTitle.get(i).equals(mCurrentTitle)) return i;
+        }
+        return -1;
     }
 }
