@@ -13,6 +13,7 @@ import java.util.List;
 
 public class EmotionVpAdapter extends FragmentPageAdapter {
     private List<Fragment> datas;
+
     public EmotionVpAdapter(FragmentManager fm, List<Fragment> datas) {
         super(fm);
         this.datas = datas;

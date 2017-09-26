@@ -19,19 +19,19 @@ import android.widget.RelativeLayout;
 
 import com.example.testinput.adapter.recycleradaper.BaseRecyclerAdapter;
 import com.example.testinput.decoration.VerticalDividerItemDecoration;
-import com.example.testinput.keyboard.entity.EmotionEntity;
 import com.example.testinput.keyboard.EmotionFragment;
-import com.example.testinput.keyboard.util.EmotionKeyboardManager;
 import com.example.testinput.keyboard.EmotionTitleAdapter;
-import com.example.testinput.keyboard.EmotionVpIndicator;
 import com.example.testinput.keyboard.EmotionVpAdapter;
+import com.example.testinput.keyboard.EmotionVpIndicator;
+import com.example.testinput.keyboard.entity.EmotionEntity;
+import com.example.testinput.keyboard.entity.SingleEmotion;
+import com.example.testinput.keyboard.util.EmotionKeyboardManager;
 import com.example.testinput.keyboard.util.EmotionUtil;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
      * @param title      表情标签主题
      * @param emotionMap 表情集合
      */
-    private void createFragmentFromMap(boolean isEmotion, String title, HashMap<String, Integer> emotionMap) {
+    private void createFragmentFromMap(boolean isEmotion, String title, LinkedHashMap<String, Integer> emotionMap) {
         int emotionSize, childPageCount;
         if (isEmotion) {
             emotionSize = EmotionFragment.COLUMN_COUNT_EMOTION * EmotionFragment.ROW_COUNT_EMOTION - 1;
@@ -151,20 +151,19 @@ public class MainActivity extends AppCompatActivity {
             childPageCount = emotionMap.size() / emotionSize + 1;
         }
         EmotionEntity entity = null;
-        Set<Map.Entry<String, Integer>> entries = emotionMap.entrySet();
-        Map.Entry<String, Integer>[] emotionArray = new Map.Entry[entries.size()];
-        entries.toArray(emotionArray);
-        for (int i = 0; i < emotionArray.length; i++) {
-            if (i % emotionSize == 0) {
-                HashMap<String, Integer> childMap = new HashMap<>();
+        for (Map.Entry<String, Integer> map : emotionMap.entrySet()) {
+            SingleEmotion emotion = new SingleEmotion();
+            emotion.setEmotionName(map.getKey())
+                    .setEmotionResId(map.getValue());
+            if (entity == null || entity.getEmotions().size() == emotionSize) {
+                ArrayList<SingleEmotion> emotions = new ArrayList<>();
                 entity = new EmotionEntity(title, childPageCount, isEmotion);
-                entity.setEmotionMap(childMap);
+                entity.setEmotions(emotions);
                 EmotionFragment instance3 = EmotionFragment.getInstance(entity);
                 mVpFragments.add(instance3);
                 emotionEntities.add(entity);
             }
-            assert entity != null;
-            entity.getEmotionMap().put(emotionArray[i].getKey(), emotionArray[i].getValue());
+            entity.getEmotions().add(emotion);
         }
     }
 

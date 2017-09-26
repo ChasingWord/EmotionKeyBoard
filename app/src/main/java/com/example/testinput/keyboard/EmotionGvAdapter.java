@@ -1,7 +1,6 @@
 package com.example.testinput.keyboard;
 
 import android.content.Context;
-import android.util.Log;
 import android.widget.GridView;
 
 import com.example.testinput.R;

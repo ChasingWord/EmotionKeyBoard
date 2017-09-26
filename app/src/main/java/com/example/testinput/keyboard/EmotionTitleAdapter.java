@@ -19,7 +19,7 @@ public class EmotionTitleAdapter extends RecyclerQuickAdapter<String> {
         mSelectPosition = 0;
     }
 
-    public void setSelectPosition(int position){
+    public void setSelectPosition(int position) {
         if (mSelectPosition == position) return;
         int tempPosition = mSelectPosition;
         mSelectPosition = position;
@@ -30,7 +30,7 @@ public class EmotionTitleAdapter extends RecyclerQuickAdapter<String> {
     @Override
     protected void convert(int viewType, RecyclerViewHelper helper, String s) {
         helper.setText(R.id.tv_emotion_title, s);
-        if (helper.getPosition() == mSelectPosition){
+        if (helper.getPosition() == mSelectPosition) {
             helper.setBackgroundColor(R.id.ll_emotion_title_container, ContextCompat.getColor(context, android.R.color.darker_gray));
         } else {
             helper.setBackgroundColor(R.id.ll_emotion_title_container, ContextCompat.getColor(context, android.R.color.holo_green_light));

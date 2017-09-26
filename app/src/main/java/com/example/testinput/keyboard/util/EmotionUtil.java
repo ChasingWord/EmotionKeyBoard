@@ -9,12 +9,11 @@ import android.os.Build;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ImageSpan;
-import android.util.Log;
 import android.widget.TextView;
 
 import com.example.testinput.R;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,25 +34,26 @@ public class EmotionUtil {
     /**
      * key-表情文字;
      * value-表情图片资源
+     * LinkedHashMap维护顺序，保证有序
      */
-    private static HashMap<String, Integer> EMPTY_MAP;
-    private static HashMap<String, Integer> EMOTION_CLASSIC_MAP1;
-    private static HashMap<String, Integer> EMOTION_CLASSIC_MAP2;
-    private static HashMap<String, Integer> EMOTION_CLASSIC_MAP3;
+    private static LinkedHashMap<String, Integer> EMPTY_MAP;
+    private static LinkedHashMap<String, Integer> EMOTION_CLASSIC_MAP1;
+    private static LinkedHashMap<String, Integer> EMOTION_CLASSIC_MAP2;
+    private static LinkedHashMap<String, Integer> EMOTION_CLASSIC_MAP3;
 
     static {
-        EMPTY_MAP = new HashMap<>();
-        EMOTION_CLASSIC_MAP1 = new HashMap<>();
+        EMPTY_MAP = new LinkedHashMap<>();
+        EMOTION_CLASSIC_MAP1 = new LinkedHashMap<>();
         EMOTION_CLASSIC_MAP1.put("[ha]", R.mipmap.ic_launcher);
         EMOTION_CLASSIC_MAP1.put("[ha1]", R.mipmap.ic_launcher);
         EMOTION_CLASSIC_MAP1.put("[ha2]", R.mipmap.ic_launcher);
         //其它表情类型Map ....
-        EMOTION_CLASSIC_MAP2 = new HashMap<>();
+        EMOTION_CLASSIC_MAP2 = new LinkedHashMap<>();
         for (int i = 0; i < 15; i++) {
             EMOTION_CLASSIC_MAP2.put("[ha" + i + "]", R.mipmap.ic_launcher);
         }
 
-        EMOTION_CLASSIC_MAP3 = new HashMap<>();
+        EMOTION_CLASSIC_MAP3 = new LinkedHashMap<>();
         for (int i = 0; i < 44; i++) {
             EMOTION_CLASSIC_MAP3.put("[ha" + i + "]", R.mipmap.ic_launcher);
         }
@@ -81,8 +81,8 @@ public class EmotionUtil {
      *
      * @param EmotionType 表情类型标志符
      */
-    public static HashMap<String, Integer> getEmotionMap(int EmotionType) {
-        HashMap EmotionMap;
+    public static LinkedHashMap<String, Integer> getEmotionMap(int EmotionType) {
+        LinkedHashMap EmotionMap;
         switch (EmotionType) {
             case EMOTION_CLASSIC_TYPE1:
                 EmotionMap = EMOTION_CLASSIC_MAP1;

@@ -19,8 +19,6 @@ import com.example.testinput.keyboard.entity.SingleEmotion;
 import com.example.testinput.keyboard.util.EmotionUtil;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by chasing on 2017/9/15.
@@ -156,14 +154,7 @@ public class EmotionFragment extends Fragment {
     };
 
     private void initData() {
-        HashMap<String, Integer> emotionMap = mEmotionEntity.getEmotionMap();
-        ArrayList<SingleEmotion> emotionList = new ArrayList<>();
-        for (Map.Entry<String, Integer> map : emotionMap.entrySet()) {
-            SingleEmotion singleEmotion = new SingleEmotion();
-            singleEmotion.setEmotionName(map.getKey());
-            singleEmotion.setEmotionResId(map.getValue());
-            emotionList.add(singleEmotion);
-        }
+        ArrayList<SingleEmotion> emotionList = mEmotionEntity.getEmotions();
         if (mEmotionEntity.isEmotionIcon()) {
             //是表情，则页面的最后一个是“删除”按钮，且保证只显示一页，不上下滚动
             for (int i = emotionList.size(); i >= mPageTotalCount; i--) {
@@ -173,7 +164,7 @@ public class EmotionFragment extends Fragment {
                 SingleEmotion singleEmotion = new SingleEmotion();
                 if (i == mPageTotalCount - 1) {
                     singleEmotion.setEmotionName("删除")
-                            .setEmotionResId(R.mipmap.ic_launcher_round);
+                            .setEmotionResId(R.mipmap.icon_del);
                     emotionList.add(singleEmotion);
                 } else {
                     singleEmotion.setEmotionName("")

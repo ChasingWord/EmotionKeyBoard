@@ -17,11 +17,10 @@
         android:id="@+id/rl_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="@android:color/darker_gray"
         android:orientation="vertical">
 
         <RelativeLayout
+            android:background="@android:color/darker_gray"
             android:layout_width="match_parent"
             android:layout_height="58dp">
 
@@ -43,7 +42,6 @@
             android:id="@+id/rl_emotion_keyboard"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@android:color/holo_red_light"
             android:visibility="gone">
 
             <android.support.v7.widget.RecyclerView

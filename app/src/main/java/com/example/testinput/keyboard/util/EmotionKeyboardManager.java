@@ -31,7 +31,7 @@ public class EmotionKeyboardManager {
 
     private int mSoftInputHeight;
 
-    private EmotionKeyboardManager(){
+    private EmotionKeyboardManager() {
     }
 
     /**
@@ -120,7 +120,7 @@ public class EmotionKeyboardManager {
         return this;
     }
 
-    public EmotionKeyboardManager build(){
+    public EmotionKeyboardManager build() {
         //设置软件盘的模式：SOFT_INPUT_ADJUST_RESIZE  这个属性表示Activity的主窗口总是会被调整大小，从而保证软键盘显示空间。
         //从而方便我们计算软件盘的高度
         mActivity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN |
@@ -129,6 +129,7 @@ public class EmotionKeyboardManager {
         hideSoftInput();
         return this;
     }
+
     /**
      * 点击返回键时先隐藏表情布局
      */
@@ -144,7 +145,7 @@ public class EmotionKeyboardManager {
      * 展示表情布局
      */
     private void showEmotionLayout() {
-        if (mSoftInputHeight <= 0){
+        if (mSoftInputHeight <= 0) {
             mSoftInputHeight = getSupportSoftInputHeight();
         }
         if (mSoftInputHeight <= 0) {
@@ -154,8 +155,10 @@ public class EmotionKeyboardManager {
         mEmotionView.getLayoutParams().height = mSoftInputHeight;
         mEmotionView.setVisibility(View.VISIBLE);
     }
+
     /**
      * 隐藏表情布局
+     *
      * @param showSoftInput 是否显示软件盘
      */
     private void hideEmotionLayout(boolean showSoftInput) {
@@ -239,7 +242,7 @@ public class EmotionKeyboardManager {
             softInputHeight = softInputHeight - getSoftButtonsBarHeight();
         }
         if (softInputHeight <= 0) {
-            Log.w("emotion","EmotionKeyboard--Warning: value of softInputHeight is below zero!");
+            Log.w("emotion", "EmotionKeyboard--Warning: value of softInputHeight is below zero!");
         }
         //存一份到本地
         if (softInputHeight > 0) {

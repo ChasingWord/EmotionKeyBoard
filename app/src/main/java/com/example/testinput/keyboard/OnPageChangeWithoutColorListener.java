@@ -1,7 +1,6 @@
 package com.example.testinput.keyboard;
 
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.EdgeEffectCompat;
 import android.widget.EdgeEffect;
 
 import java.lang.reflect.Field;
@@ -37,7 +36,7 @@ public abstract class OnPageChangeWithoutColorListener implements ViewPager.OnPa
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-        if(leftEdge != null && rightEdge != null){
+        if (leftEdge != null && rightEdge != null) {
             leftEdge.finish();
             rightEdge.finish();
             leftEdge.setSize(0, 0);

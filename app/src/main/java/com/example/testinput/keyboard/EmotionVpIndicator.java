@@ -196,15 +196,15 @@ public class EmotionVpIndicator extends LinearLayout {
     /**
      * 获取当前的表情标签主题
      */
-    public String getCurrentTitle(){
+    public String getCurrentTitle() {
         return mCurrentTitle;
     }
 
     /**
      * 获取当前的表情标签主题的索引
      */
-    public int getCurrentTitlePosition(){
-        for (int i = 0;i<mAllTitle.size();i++){
+    public int getCurrentTitlePosition() {
+        for (int i = 0; i < mAllTitle.size(); i++) {
             if (mAllTitle.get(i).equals(mCurrentTitle)) return i;
         }
         return -1;
