@@ -17,13 +17,12 @@ package com.example.testinput.adapter;
 
 import android.content.Context;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
-
-import com.example.testinput.adapter.recycleradaper.BaseRecyclerAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +38,7 @@ public abstract class BaseQuickAdapter<T, H extends ViewHelper> extends BaseAdap
 
     private ItemClickListener itemClickListener;
     private ItemLongClickListener itemLongClickListener;
+    private boolean isLongClick = false;
 
     public BaseQuickAdapter(Context context, int layoutResId) {
         this(context, layoutResId, null);
@@ -92,7 +92,6 @@ public abstract class BaseQuickAdapter<T, H extends ViewHelper> extends BaseAdap
         }
 
         return position >= data.size() ? 0 : 1;
-
     }
 
     @Override
@@ -116,11 +115,23 @@ public abstract class BaseQuickAdapter<T, H extends ViewHelper> extends BaseAdap
         view.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
+                isLongClick = true;
                 return itemLongClickListener != null && itemLongClickListener.onItemLongClick(view, position);
             }
         });
+        view.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_UP || motionEvent.getAction() == MotionEvent.ACTION_CANCEL){
+                    if (isLongClick && itemLongClickListener != null){
+                        itemLongClickListener.onItemLongClickRelease(view, position);
+                    }
+                    isLongClick = false;
+                }
+                return false;
+            }
+        });
         return helper.getView();
-
     }
 
     private View createIndeterminateProgressView(View convertView, ViewGroup parent) {
@@ -225,6 +236,7 @@ public abstract class BaseQuickAdapter<T, H extends ViewHelper> extends BaseAdap
      */
     public interface ItemLongClickListener {
         boolean onItemLongClick(View itemView, int position);
+        boolean onItemLongClickRelease(View itemView, int position);//长按释放
     }
 
     public void setItemClickListener(ItemClickListener clickListener) {

@@ -2,8 +2,9 @@ package com.example.testinput.keyboard;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,18 +39,15 @@ public class EmotionFragment extends Fragment {
     private View mRootView;
     private GridView mGvEmotion;
     private EmotionGvAdapter mEmotionGvAdapter;
+    private EditText mEtInput;
 
     /**
      * 注意：
-     *      传入进来的表情/图片的数量不能超过设置的行列数积，否则多余的部分将不会显示
-     *      表情的总数需要在行列数积的基础上-1，因为最后一个需要添加"删除"按钮
+     * 传入进来的表情/图片的数量不能超过设置的行列数积，否则多余的部分将不会显示
+     * 表情的总数需要在行列数积的基础上-1，因为最后一个需要添加"删除"按钮
      */
     private EmotionEntity mEmotionEntity;
     private int mPageTotalCount = 1;
-    private boolean initOnce = true;
-
-    private EditText mEtInput;
-
 
     public EmotionFragment() {
 
@@ -66,7 +64,7 @@ public class EmotionFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        if (mRootView == null){//vp切换时，会重新调用onCreateView，添加判断避免重复初始化
+        if (mRootView == null) {//vp切换时，会重新调用onCreateView，添加判断避免重复初始化
             mRootView = inflater.inflate(R.layout.frag_emotion, null);
             parseBundle();
             initView(mRootView);
@@ -102,7 +100,7 @@ public class EmotionFragment extends Fragment {
         mEmotionGvAdapter.setItemClickListener(new BaseQuickAdapter.ItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
-                if (mEmotionEntity.isEmotionIcon()){
+                if (mEmotionEntity.isEmotionIcon()) {
                     //是表情则显示在EditText
                     if (position == mPageTotalCount - 1) {
                         //最后一个图标是删除
@@ -120,7 +118,42 @@ public class EmotionFragment extends Fragment {
                 }
             }
         });
+
+        mEmotionGvAdapter.setItemLongClickListener(new BaseQuickAdapter.ItemLongClickListener() {
+
+            @Override
+            public boolean onItemLongClick(View itemView, int position) {
+                if (mEmotionEntity.isEmotionIcon() && position == mPageTotalCount - 1) {
+                    isDeleteEmotion = true;
+                    mHandler.sendEmptyMessage(HANDLER_DELETE_EMOTION);
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onItemLongClickRelease(View itemView, int position) {
+                isDeleteEmotion = false;
+                mHandler.removeMessages(HANDLER_DELETE_EMOTION);
+                return false;
+            }
+        });
     }
+
+    private static final int HANDLER_DELETE_EMOTION = 1;
+    private boolean isDeleteEmotion = false;
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case HANDLER_DELETE_EMOTION:
+                    removeMessages(HANDLER_DELETE_EMOTION);
+                    if (!isDeleteEmotion) return;
+                    mEtInput.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL));
+                    sendEmptyMessageDelayed(HANDLER_DELETE_EMOTION, 200);
+                    break;
+            }
+        }
+    };
 
     private void initData() {
         HashMap<String, Integer> emotionMap = mEmotionEntity.getEmotionMap();
@@ -131,7 +164,7 @@ public class EmotionFragment extends Fragment {
             singleEmotion.setEmotionResId(map.getValue());
             emotionList.add(singleEmotion);
         }
-        if (mEmotionEntity.isEmotionIcon()){
+        if (mEmotionEntity.isEmotionIcon()) {
             //是表情，则页面的最后一个是“删除”按钮，且保证只显示一页，不上下滚动
             for (int i = emotionList.size(); i >= mPageTotalCount; i--) {
                 emotionList.remove(i - 1);
