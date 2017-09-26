@@ -132,7 +132,7 @@ public class EmotionFragment extends Fragment {
             emotionList.add(singleEmotion);
         }
         if (mEmotionEntity.isEmotionIcon()){
-            //是表情，则页面的最后一个是“删除”按钮，是图片则不需要处理
+            //是表情，则页面的最后一个是“删除”按钮，且保证只显示一页，不上下滚动
             for (int i = emotionList.size(); i >= mPageTotalCount; i--) {
                 emotionList.remove(i - 1);
             }
@@ -147,6 +147,11 @@ public class EmotionFragment extends Fragment {
                             .setEmotionResId(-1);
                     emotionList.add(singleEmotion);
                 }
+            }
+        } else {
+            //是图片，则保证只显示一页，不上下滚动
+            for (int i = emotionList.size() - 1; i >= mPageTotalCount; i--) {
+                emotionList.remove(i);
             }
         }
         mEmotionGvAdapter.clear();
