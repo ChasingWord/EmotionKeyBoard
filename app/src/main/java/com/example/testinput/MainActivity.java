@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
         mEmotionTitleAdapter.setItemClickListener(new BaseRecyclerAdapter.ItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
+                mEmotionTitleAdapter.setSelectPosition(position);
                 mVpIndicator.play(mEmotionTitleAdapter.getItem(position));
             }
         });

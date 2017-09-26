@@ -109,8 +109,6 @@ public abstract class BaseRecyclerAdapter<T, H extends RecyclerViewHelper> exten
         }
 
         convert(itemViewType, helper, t);
-
-
     }
 
 

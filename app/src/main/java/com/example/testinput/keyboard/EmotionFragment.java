@@ -27,10 +27,11 @@ import java.util.Map;
  */
 public class EmotionFragment extends Fragment {
     public static final String INTENT_DATA = "data";
-    public static final String INTENT_IMG_HEIGHT = "imgHeight";
 
+    //表情的行列数
     private static final int COLUMN_COUNT_EMOTION = 7;
     private static final int ROW_COUNT_EMOTION = 3;
+    //图片的行列数
     private static final int COLUMN_COUNT_IMG = 3;
     private static final int ROW_COUNT_IMG = 2;
 
@@ -38,6 +39,11 @@ public class EmotionFragment extends Fragment {
     private GridView mGvEmotion;
     private EmotionGvAdapter mEmotionGvAdapter;
 
+    /**
+     * 注意：
+     *      传入进来的表情/图片的数量不能超过设置的行列数积，否则多余的部分将不会显示
+     *      表情的总数需要在行列数积的基础上-1，因为最后一个需要添加"删除"按钮
+     */
     private EmotionEntity mEmotionEntity;
     private int mPageTotalCount = 1;
     private boolean initOnce = true;
@@ -96,15 +102,21 @@ public class EmotionFragment extends Fragment {
         mEmotionGvAdapter.setItemClickListener(new BaseQuickAdapter.ItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
-                if (position == mPageTotalCount - 1) {
-                    //最后一个图标是删除
-                    mEtInput.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL));
+                if (mEmotionEntity.isEmotionIcon()){
+                    //是表情则显示在EditText
+                    if (position == mPageTotalCount - 1) {
+                        //最后一个图标是删除
+                        mEtInput.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL));
+                    } else {
+                        SingleEmotion singleEmotion = mEmotionGvAdapter.getItem(position);
+                        if (singleEmotion.getEmotionResId() == -1) return;
+                        String emotionString = mEtInput.getText().toString() + singleEmotion.getEmotionName();
+                        EmotionUtil.setEmotionContent(getActivity(), mEtInput, emotionString);
+                        mEtInput.setSelection(emotionString.length());
+                    }
                 } else {
-                    SingleEmotion singleEmotion = mEmotionGvAdapter.getItem(position);
-                    if (singleEmotion.getEmotionResId() == -1) return;
-                    String emotionString = mEtInput.getText().toString() + singleEmotion.getEmotionName();
-                    EmotionUtil.setEmotionContent(getActivity(), mEtInput, emotionString);
-                    mEtInput.setSelection(emotionString.length());
+                    //是图片则直接进行显示，不在EditText显示
+                    //Todo 获取Activity上面显示图片的UI，将图片直接显示上去
                 }
             }
         });
@@ -119,19 +131,22 @@ public class EmotionFragment extends Fragment {
             singleEmotion.setEmotionResId(map.getValue());
             emotionList.add(singleEmotion);
         }
-        for (int i = emotionList.size(); i >= mPageTotalCount; i--) {
-            emotionList.remove(i - 1);
-        }
-        for (int i = emotionList.size(); i < mPageTotalCount; i++) {
-            SingleEmotion singleEmotion = new SingleEmotion();
-            if (i == mPageTotalCount - 1) {
-                singleEmotion.setEmotionName("删除")
-                        .setEmotionResId(R.mipmap.ic_launcher_round);
-                emotionList.add(singleEmotion);
-            } else {
-                singleEmotion.setEmotionName("")
-                        .setEmotionResId(-1);
-                emotionList.add(singleEmotion);
+        if (mEmotionEntity.isEmotionIcon()){
+            //是表情，则页面的最后一个是“删除”按钮，是图片则不需要处理
+            for (int i = emotionList.size(); i >= mPageTotalCount; i--) {
+                emotionList.remove(i - 1);
+            }
+            for (int i = emotionList.size(); i < mPageTotalCount; i++) {
+                SingleEmotion singleEmotion = new SingleEmotion();
+                if (i == mPageTotalCount - 1) {
+                    singleEmotion.setEmotionName("删除")
+                            .setEmotionResId(R.mipmap.ic_launcher_round);
+                    emotionList.add(singleEmotion);
+                } else {
+                    singleEmotion.setEmotionName("")
+                            .setEmotionResId(-1);
+                    emotionList.add(singleEmotion);
+                }
             }
         }
         mEmotionGvAdapter.clear();
