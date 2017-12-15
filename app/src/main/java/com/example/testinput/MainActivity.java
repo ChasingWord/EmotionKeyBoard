@@ -1,170 +1,80 @@
 package com.example.testinput;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
-import com.example.testinput.adapter.recycleradaper.BaseRecyclerAdapter;
-import com.example.testinput.decoration.VerticalDividerItemDecoration;
-import com.example.testinput.keyboard.EmotionFragment;
-import com.example.testinput.keyboard.EmotionTitleAdapter;
-import com.example.testinput.keyboard.EmotionVpAdapter;
-import com.example.testinput.keyboard.EmotionVpIndicator;
-import com.example.testinput.keyboard.entity.EmotionEntity;
-import com.example.testinput.keyboard.entity.SingleEmotion;
-import com.example.testinput.keyboard.util.EmotionKeyboardManager;
-import com.example.testinput.keyboard.util.EmotionUtil;
+import com.example.emotionkeyboard.EmotionKeyboardLayout;
+import com.example.emotionkeyboard.util.EmotionKeyboardManager;
+import com.example.emotionkeyboard.util.EmotionUtil;
+import com.example.emotionkeyboard.view.EmotionFragment;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends FragmentActivity {
 
-    private RelativeLayout mRlContent;
-    private RelativeLayout mRlEmotionKeyboard;
-    private LinearLayout mRlInput;
+    private RecyclerView mRlContent;
     private ImageButton mIbChangeEmotion;
     private EditText mEtInput;
-    private ViewPager mVpEmotion;
-    private List<Fragment> mVpFragments;
-    private EmotionVpAdapter mEmotionVpAdapter;
-    private EmotionVpIndicator mVpIndicator;
-    private RecyclerView mRcvEmotionTitle;
-    private EmotionTitleAdapter mEmotionTitleAdapter;
+    private Button mSend;
+
+    private EmotionKeyboardLayout mEmotionKeyboardLayout;
+
+    private ChatListAdapter mChatListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-        mRlEmotionKeyboard = (RelativeLayout) findViewById(R.id.rl_emotion_keyboard);
-        mRlInput = (LinearLayout) findViewById(R.id.rl_input);
-        mRlContent = (RelativeLayout) findViewById(R.id.rl_content);
+        mEmotionKeyboardLayout = (EmotionKeyboardLayout) findViewById(R.id.emotion_keyboard_layout);
+        mRlContent = (RecyclerView) findViewById(R.id.rl_content);
         mIbChangeEmotion = (ImageButton) findViewById(R.id.ib);
         mEtInput = (EditText) findViewById(R.id.et_input);
+        mSend = (Button) findViewById(R.id.send);
 
-        initRcvEmotionTitle();
-        initVp();
-
+        // 一、初始化键盘管理类
         EmotionKeyboardManager.with(this)
-                .setEmotionView(mRlEmotionKeyboard)
+                .setEmotionView(mEmotionKeyboardLayout)
                 .bindToContent(mRlContent)
                 .bindToEditText(mEtInput)
                 .bindToEmotionButton(mIbChangeEmotion)
                 .build();
-    }
 
-    private List<String> mEmotionTitles;
-
-    private void initRcvEmotionTitle() {
-        mEmotionTitles = new ArrayList<>();
-        mEmotionTitleAdapter = new EmotionTitleAdapter(this, R.layout.item_emotion_title);
-        mRcvEmotionTitle = (RecyclerView) findViewById(R.id.rcv_emotion_title);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        mRcvEmotionTitle.setLayoutManager(linearLayoutManager);
-        mRcvEmotionTitle.addItemDecoration(new VerticalDividerItemDecoration.Builder(this).color(R.color.colorPrimary).build());
-        mRcvEmotionTitle.setAdapter(mEmotionTitleAdapter);
-        mEmotionTitleAdapter.setItemClickListener(new BaseRecyclerAdapter.ItemClickListener() {
+        // 二、初始化数据源
+        mEmotionKeyboardLayout.bindEditText(mEtInput);// 绑定输入控件
+        EmotionFragment.OnClickPicListener onClickPicListener = new EmotionFragment.OnClickPicListener() {
             @Override
-            public void onItemClick(View itemView, int position) {
-                mEmotionTitleAdapter.setSelectPosition(position);
-                mVpIndicator.play(mEmotionTitleAdapter.getItem(position));
+            public void onClickPic(String theme, int resId) {
+                mChatListAdapter.add(resId + "");
+            }
+        };
+        mEmotionKeyboardLayout.createEmotionFragment(true, "theme1", -1, EmotionUtil.getEmotionMap(EmotionUtil.EMOTION_CLASSIC_TYPE1), null);
+        mEmotionKeyboardLayout.createEmotionFragment(false, "theme2", R.mipmap.theme2, EmotionUtil.getEmotionMap(EmotionUtil.EMOTION_CLASSIC_TYPE2), onClickPicListener);
+        mEmotionKeyboardLayout.createEmotionFragment(true, "theme3", R.mipmap.theme3, EmotionUtil.getEmotionMap(EmotionUtil.EMOTION_CLASSIC_TYPE3), null);
+        mEmotionKeyboardLayout.createEmotionFragment(false, "theme4", R.mipmap.theme4, EmotionUtil.getEmotionMap(EmotionUtil.EMOTION_CLASSIC_TYPE4), onClickPicListener);
+        mEmotionKeyboardLayout.loadEmotionVp(getSupportFragmentManager());
+
+        mChatListAdapter = new ChatListAdapter(this, R.layout.item_chat);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        mRlContent.setLayoutManager(layoutManager);
+        mRlContent.setAdapter(mChatListAdapter);
+        mChatListAdapter.addAll(new ArrayList<String>());
+
+        mSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mChatListAdapter.add(mEtInput.getText().toString());
+                mEtInput.setText("");
             }
         });
-    }
-
-    private ArrayList<EmotionEntity> emotionEntities;
-
-    private void initVp() {
-        mVpEmotion = (ViewPager) findViewById(R.id.vp_emotion);
-        mVpIndicator = (EmotionVpIndicator) findViewById(R.id.vp_indicator);
-        mVpFragments = new ArrayList<>();
-        emotionEntities = new ArrayList<>();
-
-        createFragmentFromMap(true, "theme1", EmotionUtil.getEmotionMap(EmotionUtil.EMOTION_CLASSIC_TYPE1));
-        mEmotionTitles.add("theme1");
-
-        createFragmentFromMap(false, "theme2", EmotionUtil.getEmotionMap(EmotionUtil.EMOTION_CLASSIC_TYPE2));
-        mEmotionTitles.add("theme2");
-
-        createFragmentFromMap(true, "theme3", EmotionUtil.getEmotionMap(EmotionUtil.EMOTION_CLASSIC_TYPE3));
-        mEmotionTitles.add("theme3");
-
-        mEmotionVpAdapter = new EmotionVpAdapter(getFragmentManager(), mVpFragments);
-        mVpEmotion.setAdapter(mEmotionVpAdapter);
-        mVpIndicator.bindViewPager(mVpEmotion, emotionEntities, mEmotionTitles);
-        mEmotionTitleAdapter.addAll(mEmotionTitles);
-
-        mVpEmotion.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                mEmotionTitleAdapter.setSelectPosition(mVpIndicator.getCurrentTitlePosition());
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
-    }
-
-    /**
-     * 根据表情集合Map进行创建EmotionFragment
-     *
-     * @param isEmotion  是否是表情 true为表情 false为图片
-     * @param title      表情标签主题
-     * @param emotionMap 表情集合
-     */
-    private void createFragmentFromMap(boolean isEmotion, String title, LinkedHashMap<String, Integer> emotionMap) {
-        int emotionSize, childPageCount;
-        if (isEmotion) {
-            emotionSize = EmotionFragment.COLUMN_COUNT_EMOTION * EmotionFragment.ROW_COUNT_EMOTION - 1;
-        } else {
-            emotionSize = EmotionFragment.COLUMN_COUNT_IMG * EmotionFragment.ROW_COUNT_IMG;
-        }
-        if (emotionMap.size() % emotionSize == 0) {
-            childPageCount = emotionMap.size() / emotionSize;
-        } else {
-            childPageCount = emotionMap.size() / emotionSize + 1;
-        }
-        EmotionEntity entity = null;
-        for (Map.Entry<String, Integer> map : emotionMap.entrySet()) {
-            SingleEmotion emotion = new SingleEmotion();
-            emotion.setEmotionName(map.getKey())
-                    .setEmotionResId(map.getValue());
-            if (entity == null || entity.getEmotions().size() == emotionSize) {
-                ArrayList<SingleEmotion> emotions = new ArrayList<>();
-                entity = new EmotionEntity(title, childPageCount, isEmotion);
-                entity.setEmotions(emotions);
-                EmotionFragment instance3 = EmotionFragment.getInstance(entity);
-                mVpFragments.add(instance3);
-                emotionEntities.add(entity);
-            }
-            entity.getEmotions().add(emotion);
-        }
     }
 
     private void showSoftInput() {
@@ -180,27 +90,5 @@ public class MainActivity extends AppCompatActivity {
             inputMethodManager.hideSoftInputFromWindow(mEtInput.getWindowToken()
                     , InputMethodManager.HIDE_IMPLICIT_ONLY);
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 }

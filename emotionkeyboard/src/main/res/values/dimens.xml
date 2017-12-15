@@ -1,0 +1,8 @@
+<resources>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="indicator_margin">2dp</dimen>
+    <dimen name="indicator_side">24dp</dimen>
+    <dimen name="emotion_popup">120dp</dimen>
+    <dimen name="emotion_title_height">32dp</dimen>
+    <dimen name="emotion_title_width">60dp</dimen>
+</resources>
