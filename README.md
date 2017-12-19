@@ -26,6 +26,7 @@ mEmotionKeyboardLayout.createEmotionFragment(true, "theme1", -1, EmotionUtil.get
 mEmotionKeyboardLayout.createEmotionFragment(false, "theme2",R.mipmap.theme2,EmotionUtil.getEmotionMap(EmotionUtil.EMOTION_CLASSIC_TYPE2),       onClickPicListener);
 mEmotionKeyboardLayout.createEmotionFragment(true, "theme3", R.mipmap.theme3,EmotionUtil.getEmotionMap(EmotionUtil.EMOTION_CLASSIC_TYPE3),       null);
 mEmotionKeyboardLayout.createEmotionFragment(false, "theme4",R.mipmap.theme4,EmotionUtil.getEmotionMap(EmotionUtil.EMOTION_CLASSIC_TYPE4),       onClickPicListener);
+mEmotionKeyboardLayout.initLocalFileEmotion(onClickPicListener);//加载本地图片
 mEmotionKeyboardLayout.loadEmotionVp(getSupportFragmentManager());
 
 ## Thank
