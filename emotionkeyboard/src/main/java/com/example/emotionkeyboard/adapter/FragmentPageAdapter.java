@@ -15,10 +15,10 @@ package com.example.emotionkeyboard.adapter;
  * limitations under the License.
  */
 
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.os.Parcelable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.util.Log;
 import android.view.View;
@@ -86,14 +86,16 @@ public abstract class FragmentPageAdapter extends PagerAdapter {
         if (mCurTransaction == null) {
             mCurTransaction = mFragmentManager.beginTransaction();
         }
+//        mCurTransaction.remove((Fragment) object);
+//        mCurTransaction.commitNowAllowingStateLoss();
         if (DEBUG) Log.v(TAG, "Detaching item #" + getItemId(position) + ": f=" + object
-                + " v=" + ((Fragment)object).getView());
+                + " v=" + ((Fragment) object).getView());
         mCurTransaction.detach((Fragment)object);
     }
 
     @Override
     public void setPrimaryItem(ViewGroup container, int position, Object object) {
-        Fragment fragment = (Fragment)object;
+        Fragment fragment = (Fragment) object;
         if (fragment != mCurrentPrimaryItem) {
             if (mCurrentPrimaryItem != null) {
                 mCurrentPrimaryItem.setMenuVisibility(false);
@@ -117,7 +119,7 @@ public abstract class FragmentPageAdapter extends PagerAdapter {
 
     @Override
     public boolean isViewFromObject(View view, Object object) {
-        return ((Fragment)object).getView() == view;
+        return ((Fragment) object).getView() == view;
     }
 
     @Override
@@ -131,7 +133,7 @@ public abstract class FragmentPageAdapter extends PagerAdapter {
 
     /**
      * Return a unique identifier for the item at the given position.
-     *
+     * <p>
      * <p>The default implementation returns the given position.
      * Subclasses should override this method if the positions of items can change.</p>
      *

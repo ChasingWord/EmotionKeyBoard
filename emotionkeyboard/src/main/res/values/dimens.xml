@@ -5,4 +5,5 @@
     <dimen name="emotion_popup">120dp</dimen>
     <dimen name="emotion_title_height">32dp</dimen>
     <dimen name="emotion_title_width">60dp</dimen>
+    <dimen name="dialog_width">150dp</dimen>
 </resources>

@@ -157,6 +157,13 @@ public abstract class BaseQuickAdapter<T, H extends ViewHelper> extends BaseAdap
         }
     }
 
+    public void add(int position, T elem) {
+        if (elem != null) {
+            data.add(position, elem);
+            notifyDataSetChanged();
+        }
+    }
+
     public void addAll(List<T> elem) {
         if (elem != null && !elem.isEmpty()) {
             data.addAll(elem);

@@ -5,13 +5,11 @@
 
     <ImageView
         android:id="@+id/iv_chat_pic"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:scaleType="centerInside"
-        android:maxHeight="200dp"
-        android:maxWidth="200dp"/>
+        android:layout_width="100dp"
+        android:layout_height="100dp"/>
 
     <TextView
+        android:textSize="15sp"
         android:id="@+id/tv_chat_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>

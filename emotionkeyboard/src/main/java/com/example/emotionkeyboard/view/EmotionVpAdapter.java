@@ -3,6 +3,11 @@ package com.example.emotionkeyboard.view;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
+import android.view.ViewGroup;
+
+import com.example.emotionkeyboard.adapter.FragmentPageAdapter;
 
 import java.util.List;
 
@@ -12,10 +17,29 @@ import java.util.List;
  */
 public class EmotionVpAdapter extends FragmentPagerAdapter {
     private List<Fragment> datas;
+    private FragmentManager fm;
+    private int mChildCount = 0;
 
     public EmotionVpAdapter(FragmentManager fm, List<Fragment> datas) {
         super(fm);
+        this.fm = fm;
         this.datas = datas;
+    }
+
+    public void setDatas(List<Fragment> datas) {
+        mChildCount = getCount();
+        this.datas = datas;
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public int getItemPosition(Object object) {
+        // 最简单解决 notifyDataSetChanged() 页面不刷新问题的方法
+        if ( mChildCount > 0) {
+            mChildCount --;
+            return POSITION_NONE;
+        }
+        return super.getItemPosition(object);
     }
 
     @Override

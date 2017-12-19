@@ -1,33 +1,39 @@
 package com.example.emotionkeyboard.view;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.GridView;
 
 import com.example.emotionkeyboard.EmotionPopup;
 import com.example.emotionkeyboard.R;
-import com.example.emotionkeyboard.adapter.BaseQuickAdapter;
+import com.example.emotionkeyboard.adapter.recycleradaper.BaseRecyclerAdapter;
 import com.example.emotionkeyboard.entity.EmotionEntity;
 import com.example.emotionkeyboard.entity.SingleEmotion;
 import com.example.emotionkeyboard.util.EmotionUtil;
 import com.example.emotionkeyboard.util.GenericTools;
+import com.example.emotionkeyboard.view.manager.LocalPicManagerActivity;
 
 import java.util.ArrayList;
 
 /**
  * Created by chasing on 2017/9/15.
- * 一页表情
+ * 显示一页表情
  */
 public class EmotionFragment extends Fragment {
-    public static final String INTENT_DATA = "data";
+    public static final String INTENT_EMOTION_DATA = "emotionData";
+    public static final String INTENT_BACK_HAD_CHANGE = "hadChangeLocalPic";
+
+    public static final int REQUEST_CODE_PIC_MANAGER = 2;
 
     //表情的行列数
     public static final int COLUMN_COUNT_EMOTION = 7;
@@ -38,10 +44,11 @@ public class EmotionFragment extends Fragment {
 
     private int mColumnCount = COLUMN_COUNT_IMG;
     private View mRootView;
-    private GridView mGvEmotion;
-    private EmotionGvAdapter mEmotionGvAdapter;
+    private RecyclerView mRcvEmotion;
+    private EmotionAdapter mEmotionAdapter;
     private EditText mEtInput;
     private OnClickPicListener mOnClickPicListener;
+    private OnChangeLocalPicListener mOnChangeLocalPicListener;
 
     // 长按的弹窗
     private EmotionPopup mEmotionPopup;
@@ -57,7 +64,7 @@ public class EmotionFragment extends Fragment {
     public static EmotionFragment getInstance(EmotionEntity emotionEntity) {
         EmotionFragment emotionFragment = new EmotionFragment();
         Bundle bundle = new Bundle();
-        bundle.putSerializable(INTENT_DATA, emotionEntity);
+        bundle.putSerializable(INTENT_EMOTION_DATA, emotionEntity);
         emotionFragment.setArguments(bundle);
         return emotionFragment;
     }
@@ -77,7 +84,7 @@ public class EmotionFragment extends Fragment {
     /**
      * 绑定输入控件
      */
-    public void bindEditText(EditText editText){
+    public void bindEditText(EditText editText) {
         mEtInput = editText;
     }
 
@@ -85,14 +92,18 @@ public class EmotionFragment extends Fragment {
         mOnClickPicListener = onClickPicListener;
     }
 
+    public void setOnChangeLocalPicListener(OnChangeLocalPicListener onChangeLocalPicListener) {
+        mOnChangeLocalPicListener = onChangeLocalPicListener;
+    }
+
     private void parseBundle() {
         Bundle arguments = getArguments();
-        mEmotionEntity = (EmotionEntity) arguments.getSerializable(INTENT_DATA);
+        mEmotionEntity = (EmotionEntity) arguments.getSerializable(INTENT_EMOTION_DATA);
     }
 
     private void initView(View rootView) {
         mEmotionPopup = new EmotionPopup(getActivity());
-        mGvEmotion = rootView.findViewById(R.id.grid_emotion);
+        mRcvEmotion = rootView.findViewById(R.id.rcv_emotion);
         int rowCount;
         if (mEmotionEntity.isEmotionIcon()) {
             rowCount = ROW_COUNT_EMOTION;
@@ -108,38 +119,45 @@ public class EmotionFragment extends Fragment {
             mColumnCount = COLUMN_COUNT_IMG;
             mPageTotalCount *= COLUMN_COUNT_IMG;
         }
-        mGvEmotion.setNumColumns(mColumnCount);
-        mEmotionGvAdapter = new EmotionGvAdapter(mGvEmotion, getActivity(), R.layout.item_emotion, rowCount);
-        mGvEmotion.setAdapter(mEmotionGvAdapter);
-        mEmotionGvAdapter.setItemClickListener(new BaseQuickAdapter.ItemClickListener() {
+        GridLayoutManager layoutManager = new GridLayoutManager(getContext(), mColumnCount);
+        mRcvEmotion.setLayoutManager(layoutManager);
+        mEmotionAdapter = new EmotionAdapter(mRcvEmotion, getActivity(), R.layout.item_emotion, rowCount);
+        mRcvEmotion.setAdapter(mEmotionAdapter);
+        mEmotionAdapter.setItemClickListener(new BaseRecyclerAdapter.ItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
+                SingleEmotion singleEmotion = mEmotionAdapter.getItem(position);
                 if (mEmotionEntity.isEmotionIcon()) {
                     //是表情则显示在EditText
                     if (position == mPageTotalCount - 1) {
                         //最后一个图标是删除
                         mEtInput.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL));
                     } else {
-                        SingleEmotion singleEmotion = mEmotionGvAdapter.getItem(position);
-                        if (singleEmotion.getEmotionResId() == -1) return;
+                        if (singleEmotion.getEmotionResId() <= 0) return;
                         String emotionString = mEtInput.getText().toString() + singleEmotion.getEmotionName();
                         EmotionUtil.setEmotionContent(getActivity(), mEtInput, emotionString);
                         mEtInput.setSelection(emotionString.length());
                     }
                 } else {
-                    //是图片则直接进行显示，不在EditText显示
-                    //通过回调自行处理
-                    if (mOnClickPicListener != null)
-                        mOnClickPicListener.onClickPic(mEmotionEntity.getTheme(), mEmotionGvAdapter.getItem(position).getEmotionResId());
+                    if (singleEmotion.getEmotionName().equals("add")) {
+                        Intent intent = new Intent(getActivity(), LocalPicManagerActivity.class);
+                        startActivityForResult(intent, REQUEST_CODE_PIC_MANAGER);
+                    } else {
+                        //是图片则直接进行显示，不在EditText显示
+                        //通过回调自行处理
+                        if (mOnClickPicListener != null)
+                            mOnClickPicListener.onClickPic(mEmotionEntity.getTheme(), singleEmotion.getEmotionResId(), singleEmotion.getEmotionFilePath());
+                    }
                 }
             }
         });
 
-        mEmotionGvAdapter.setItemLongClickListener(new BaseQuickAdapter.ItemLongClickListener() {
-
+        mEmotionAdapter.setItemLongClickListener(new BaseRecyclerAdapter.ItemLongClickListener() {
             @Override
             public boolean onItemLongClick(View itemView, int position) {
-                SingleEmotion singleEmotion = mEmotionGvAdapter.getItem(position);
+                SingleEmotion singleEmotion = mEmotionAdapter.getItem(position);
+                if (singleEmotion.getEmotionName().equals("add")) return false;
+
                 if (mEmotionEntity.isEmotionIcon() && position == mPageTotalCount - 1) {
                     isDeleteEmotion = true;
                     mHandler.sendEmptyMessage(HANDLER_DELETE_EMOTION);
@@ -155,18 +173,19 @@ public class EmotionFragment extends Fragment {
                         // 不是最左边一个
                         offsetX -= (getContext().getResources().getDimensionPixelSize(R.dimen.emotion_popup) - mRootView.getWidth() / mColumnCount) / 2;
                     }
-                    mEmotionPopup.show(offsetX, offsetY, singleEmotion.getEmotionResId());
+                    mEmotionPopup.show(offsetX, offsetY, singleEmotion);
                     return true;
                 }
                 return false;
             }
+        });
 
+        mEmotionAdapter.setItemLongClickReleaseListener(new BaseRecyclerAdapter.ItemLongClickReleaseListener() {
             @Override
-            public boolean onItemLongClickRelease(View itemView, int position) {
+            public void onItemLongClickRelease(View itemView, int position) {
                 isDeleteEmotion = false;
                 mHandler.removeMessages(HANDLER_DELETE_EMOTION);
                 mEmotionPopup.hide();
-                return false;
             }
         });
     }
@@ -198,16 +217,15 @@ public class EmotionFragment extends Fragment {
             for (int i = emotionList.size(); i >= mPageTotalCount; i--) {
                 emotionList.remove(i - 1);
             }
+            SingleEmotion singleEmotion;
             for (int i = emotionList.size(); i < mPageTotalCount; i++) {
-                SingleEmotion singleEmotion = new SingleEmotion();
+                singleEmotion = new SingleEmotion();
                 if (i == mPageTotalCount - 1) {
                     singleEmotion.setEmotionName("删除")
                             .setEmotionResId(R.mipmap.icon_del);
                     emotionList.add(singleEmotion);
                 } else {
                     // 直到最后一个“删除”按钮之前都添加空白
-                    singleEmotion.setEmotionName("")
-                            .setEmotionResId(-1);
                     emotionList.add(singleEmotion);
                 }
             }
@@ -217,8 +235,8 @@ public class EmotionFragment extends Fragment {
                 emotionList.remove(i);
             }
         }
-        mEmotionGvAdapter.clear();
-        mEmotionGvAdapter.addAll(emotionList);
+        mEmotionAdapter.clear();
+        mEmotionAdapter.addAll(emotionList);
     }
 
     @Override
@@ -227,6 +245,22 @@ public class EmotionFragment extends Fragment {
     }
 
     public interface OnClickPicListener {
-        void onClickPic(String theme, int resId);
+        void onClickPic(String theme, int resId, String path);
+    }
+
+    public interface OnChangeLocalPicListener {
+        void onChangeLocalPic();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_PIC_MANAGER && data != null) {
+            boolean hadChange = data.getBooleanExtra(INTENT_BACK_HAD_CHANGE, false);
+            if (hadChange) {
+                if (mOnChangeLocalPicListener != null)
+                    mOnChangeLocalPicListener.onChangeLocalPic();
+            }
+        }
     }
 }

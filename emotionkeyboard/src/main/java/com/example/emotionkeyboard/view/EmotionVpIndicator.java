@@ -74,6 +74,11 @@ public class EmotionVpIndicator extends LinearLayout {
         setLayoutParams(layoutParams);
     }
 
+    public void resetEmotionEntity(List<EmotionEntity> emotionEntities){
+        mEmotionEntities = emotionEntities;
+        play("other");
+    }
+
     /**
      * 绑定目标ViewPager及数据源
      */

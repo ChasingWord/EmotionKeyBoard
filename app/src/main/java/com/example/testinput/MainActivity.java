@@ -17,10 +17,12 @@ import com.example.emotionkeyboard.util.EmotionUtil;
 import com.example.emotionkeyboard.view.EmotionFragment;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends FragmentActivity {
 
-    private RecyclerView mRlContent;
+    private RecyclerView mRcvContent;
     private ImageButton mIbChangeEmotion;
     private EditText mEtInput;
     private Button mSend;
@@ -35,7 +37,7 @@ public class MainActivity extends FragmentActivity {
         setContentView(R.layout.activity_main);
 
         mEmotionKeyboardLayout = (EmotionKeyboardLayout) findViewById(R.id.emotion_keyboard_layout);
-        mRlContent = (RecyclerView) findViewById(R.id.rl_content);
+        mRcvContent = (RecyclerView) findViewById(R.id.rl_content);
         mIbChangeEmotion = (ImageButton) findViewById(R.id.ib);
         mEtInput = (EditText) findViewById(R.id.et_input);
         mSend = (Button) findViewById(R.id.send);
@@ -43,7 +45,7 @@ public class MainActivity extends FragmentActivity {
         // 一、初始化键盘管理类
         EmotionKeyboardManager.with(this)
                 .setEmotionView(mEmotionKeyboardLayout)
-                .bindToContent(mRlContent)
+                .bindToContent(mRcvContent)
                 .bindToEditText(mEtInput)
                 .bindToEmotionButton(mIbChangeEmotion)
                 .build();
@@ -52,27 +54,35 @@ public class MainActivity extends FragmentActivity {
         mEmotionKeyboardLayout.bindEditText(mEtInput);// 绑定输入控件
         EmotionFragment.OnClickPicListener onClickPicListener = new EmotionFragment.OnClickPicListener() {
             @Override
-            public void onClickPic(String theme, int resId) {
-                mChatListAdapter.add(resId + "");
+            public void onClickPic(String theme, int resId, String picFilePath) {
+                Map<String,String> map = new HashMap<>();
+                map.put(ChatListAdapter.RES_ID, String.valueOf(resId));
+                map.put(ChatListAdapter.PIC_FILE_PATH, picFilePath);
+                mChatListAdapter.add(map);
+                mRcvContent.scrollToPosition(mChatListAdapter.getItemCount() - 1);
             }
         };
-        mEmotionKeyboardLayout.createEmotionFragment(true, "theme1", -1, EmotionUtil.getEmotionMap(EmotionUtil.EMOTION_CLASSIC_TYPE1), null);
+        mEmotionKeyboardLayout.createEmotionFragment(false, "theme1", -1, EmotionUtil.getEmotionMap(EmotionUtil.EMOTION_CLASSIC_TYPE1), onClickPicListener);
         mEmotionKeyboardLayout.createEmotionFragment(false, "theme2", R.mipmap.theme2, EmotionUtil.getEmotionMap(EmotionUtil.EMOTION_CLASSIC_TYPE2), onClickPicListener);
-        mEmotionKeyboardLayout.createEmotionFragment(true, "theme3", R.mipmap.theme3, EmotionUtil.getEmotionMap(EmotionUtil.EMOTION_CLASSIC_TYPE3), null);
+        mEmotionKeyboardLayout.createEmotionFragment(true, "theme3", R.mipmap.theme3, EmotionUtil.getEmotionMap(EmotionUtil.EMOTION_CLASSIC_TYPE3), onClickPicListener);
         mEmotionKeyboardLayout.createEmotionFragment(false, "theme4", R.mipmap.theme4, EmotionUtil.getEmotionMap(EmotionUtil.EMOTION_CLASSIC_TYPE4), onClickPicListener);
+        mEmotionKeyboardLayout.initLocalFileEmotion(onClickPicListener);
         mEmotionKeyboardLayout.loadEmotionVp(getSupportFragmentManager());
 
         mChatListAdapter = new ChatListAdapter(this, R.layout.item_chat);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        mRlContent.setLayoutManager(layoutManager);
-        mRlContent.setAdapter(mChatListAdapter);
-        mChatListAdapter.addAll(new ArrayList<String>());
+        mRcvContent.setLayoutManager(layoutManager);
+        mRcvContent.setAdapter(mChatListAdapter);
+        mChatListAdapter.addAll(new ArrayList<Map<String, String>>());
 
         mSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mChatListAdapter.add(mEtInput.getText().toString());
+                Map<String,String> map = new HashMap<>();
+                map.put(ChatListAdapter.CONTENT, mEtInput.getText().toString());
+                mChatListAdapter.add(map);
                 mEtInput.setText("");
+                mRcvContent.scrollToPosition(mChatListAdapter.getItemCount() - 1);
             }
         });
     }

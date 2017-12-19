@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -21,8 +22,10 @@ public abstract class BaseRecyclerAdapter<T, H extends RecyclerViewHelper> exten
 
     private ItemClickListener itemClickListener;
     private ItemLongClickListener itemLongClickListener;
+    private ItemLongClickReleaseListener onItemLongClickRelease;
     private ViewGroup.LayoutParams itemParams;
 
+    private boolean isLongClick;
 
     /**
      * click
@@ -37,6 +40,10 @@ public abstract class BaseRecyclerAdapter<T, H extends RecyclerViewHelper> exten
      */
     public interface ItemLongClickListener {
         boolean onItemLongClick(View itemView, int position);
+    }
+
+    public interface ItemLongClickReleaseListener{
+        void onItemLongClickRelease(View itemView, int position);
     }
 
 
@@ -76,9 +83,7 @@ public abstract class BaseRecyclerAdapter<T, H extends RecyclerViewHelper> exten
             return new BaseRecylerViewHolder(view);
 //            return  recylerViewHolderHelper;
         }
-
     }
-
 
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
@@ -99,7 +104,21 @@ public abstract class BaseRecyclerAdapter<T, H extends RecyclerViewHelper> exten
         viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
+                isLongClick = true;
                 return onItemLongClick(viewHolder, position);
+            }
+        });
+
+        viewHolder.itemView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_UP || motionEvent.getAction() == MotionEvent.ACTION_CANCEL){
+                    if (isLongClick && onItemLongClickRelease != null){
+                        onItemLongClickRelease.onItemLongClickRelease(view, position);
+                    }
+                    isLongClick = false;
+                }
+                return false;
             }
         });
 
@@ -117,12 +136,10 @@ public abstract class BaseRecyclerAdapter<T, H extends RecyclerViewHelper> exten
         this.baseRecyclerMultitemTypeSupport = baseRecyclerMultitemTypeSupport;
     }
 
-
     @Override
     public int getItemCount() {
         return datas.size();
     }
-
 
     @Override
     public int getItemViewType(int position) {
@@ -140,13 +157,29 @@ public abstract class BaseRecyclerAdapter<T, H extends RecyclerViewHelper> exten
         }
     }
 
+    public void add(int position, T elem) {
+        if (elem != null) {
+            datas.add(position, elem);
+            notifyItemInserted(position);
+            if (datas.size() > position + 1) {
+                notifyItemRangeChanged(position + 1, datas.size() - position - 1);
+            }
+        }
+    }
+
     public void addAll(List<T> elem) {
         if (elem != null && !elem.isEmpty()) {
             int index = datas.size();
             datas.addAll(elem);
             notifyDataSetChanged();
         }
+    }
 
+    public void addAll(int position, List<T> elem){
+        if (elem != null && !elem.isEmpty()) {
+            datas.addAll(position, elem);
+            notifyDataSetChanged();
+        }
     }
 
     public void addAllNoNotify(List<T> elem) {
@@ -234,9 +267,11 @@ public abstract class BaseRecyclerAdapter<T, H extends RecyclerViewHelper> exten
         this.itemLongClickListener = longClickListener;
     }
 
+    public void setItemLongClickReleaseListener(ItemLongClickReleaseListener longClickReleaseListener){
+        onItemLongClickRelease = longClickReleaseListener;
+    }
+
     protected abstract H getAdapterHelper(int position, View itemView);
 
     protected abstract void convert(int viewType, RecyclerViewHelper helper, T t);
-
-
 }

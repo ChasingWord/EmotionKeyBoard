@@ -93,15 +93,15 @@ public class EmotionUtil {
     /**
      * 根据名称获取当前表情图标R值
      *
-     * @param imgName     名称
+     * @param imgName 名称
      * @return resId
      */
     public static int getImgByName(String imgName) {
         Integer integer = EMOTION_CLASSIC_MAP1.get(imgName);
-        if (integer == null){
+        if (integer == null) {
             integer = EMOTION_CLASSIC_MAP2.get(imgName);
         }
-        if (integer == null){
+        if (integer == null) {
             integer = EMOTION_CLASSIC_MAP3.get(imgName);
         }
         return integer == null ? -1 : integer;
@@ -137,7 +137,7 @@ public class EmotionUtil {
     public static void setEmotionContent(final Context context, final TextView tv, String msg) {
         SpannableString spannableString = new SpannableString(msg);
         Resources res = context.getResources();
-        String regexEmotion = "\\[([\u4e00-\u9fa5\\w])+\\]";
+        String regexEmotion = "\\[([\u4e00-\u9fa5\\w])+\\]";    //   “\u4e00-\u9fa5”匹配 “一-龥”的所有中文字符  “\w”匹配所有英文数字下划线
         Pattern patternEmotion = Pattern.compile(regexEmotion);
         Matcher matcherEmotion = patternEmotion.matcher(spannableString);
         while (matcherEmotion.find()) {
@@ -149,7 +149,7 @@ public class EmotionUtil {
             Integer imgRes = getImgByName(key);
             if (imgRes != -1) {
                 // 压缩表情图片
-                int size = (int) tv.getTextSize() * 13 / 10;
+                int size = (int) (tv.getTextSize() * 13 / 10f);
                 Bitmap bitmap = BitmapFactory.decodeResource(res, imgRes);
                 Bitmap scaleBitmap = Bitmap.createScaledBitmap(bitmap, size, size, true);
                 ImageSpan span = new ImageSpan(context, scaleBitmap);
