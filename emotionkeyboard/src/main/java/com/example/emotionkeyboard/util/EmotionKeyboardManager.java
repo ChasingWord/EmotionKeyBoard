@@ -24,6 +24,7 @@ public class EmotionKeyboardManager {
     private static final String SHARE_PREFERENCE_NAME = "emotionKeyboard";
     private View mContentView;
     private View mEmotionView;
+    private View mFunctionView;
     private Activity mActivity;
     private EditText mEtInput;
     private InputMethodManager mInputMethodManager;
@@ -54,7 +55,7 @@ public class EmotionKeyboardManager {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 hideSoftInput();
-                hideEmotionLayout(false);
+                hideAllView();
                 return false;
             }
         });
@@ -72,7 +73,9 @@ public class EmotionKeyboardManager {
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 if (motionEvent.getAction() == MotionEvent.ACTION_UP && mEmotionView.isShown()) {
                     lockContentHeight();//显示软件盘时，锁定内容高度，防止跳闪。
-                    hideEmotionLayout(true);//隐藏表情布局，显示软件盘
+                    hideEmotionLayout();//隐藏表情布局，显示软件盘
+                    hideFunctionLayout();
+                    showSoftInput();
                     //软件盘显示后，释放内容高度
                     mEtInput.postDelayed(new Runnable() {
                         @Override
@@ -96,7 +99,8 @@ public class EmotionKeyboardManager {
             public void onClick(View v) {
                 if (mEmotionView.isShown()) {
                     lockContentHeight();//显示软件盘时，锁定内容高度，防止跳闪。
-                    hideEmotionLayout(true);//隐藏表情布局，显示软件盘
+                    hideEmotionLayout();//隐藏表情布局，显示软件盘
+                    showSoftInput();
                     unlockContentHeightDelayed();//软件盘显示后，释放内容高度
                 } else {
                     if (isSoftInputShown()) {//同上
@@ -104,7 +108,36 @@ public class EmotionKeyboardManager {
                         showEmotionLayout();
                         unlockContentHeightDelayed();
                     } else {
+                        hideFunctionLayout();
                         showEmotionLayout();//两者都没显示，直接显示表情布局
+                    }
+                }
+            }
+        });
+        return this;
+    }
+
+    /**
+     * 绑定功能按钮
+     */
+    public EmotionKeyboardManager bindToFunctionButton(View functionButton) {
+        functionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mFunctionView == null) throw new NullPointerException("FunctionView must not be null");
+                if (mFunctionView.isShown()) {
+                    lockContentHeight();//显示软件盘时，锁定内容高度，防止跳闪。
+                    hideFunctionLayout();//隐藏表情布局，显示软件盘
+                    showSoftInput();
+                    unlockContentHeightDelayed();//软件盘显示后，释放内容高度
+                } else {
+                    if (isSoftInputShown()) {//同上
+                        lockContentHeight();
+                        showFunctionLayout();
+                        unlockContentHeightDelayed();
+                    } else {
+                        hideEmotionLayout();
+                        showFunctionLayout();//两者都没显示，直接显示表情布局
                     }
                 }
             }
@@ -117,6 +150,14 @@ public class EmotionKeyboardManager {
      */
     public EmotionKeyboardManager setEmotionView(View emotionView) {
         mEmotionView = emotionView;
+        return this;
+    }
+
+    /**
+     * 设置功能键盘
+     */
+    public EmotionKeyboardManager setFunctionView(View functionView) {
+        mFunctionView = functionView;
         return this;
     }
 
@@ -135,7 +176,7 @@ public class EmotionKeyboardManager {
      */
     public boolean interceptBackPress() {
         if (mEmotionView.isShown()) {
-            hideEmotionLayout(false);
+            hideEmotionLayout();
             return true;
         }
         return false;
@@ -157,17 +198,44 @@ public class EmotionKeyboardManager {
     }
 
     /**
-     * 隐藏表情布局
-     *
-     * @param showSoftInput 是否显示软件盘
+     * 展示功能布局
      */
-    private void hideEmotionLayout(boolean showSoftInput) {
-        if (mEmotionView.isShown()) {
-            mEmotionView.setVisibility(View.GONE);
-            if (showSoftInput) {
-                showSoftInput();
-            }
+    private void showFunctionLayout() {
+        if (mSoftInputHeight <= 0) {
+            mSoftInputHeight = getSupportSoftInputHeight();
         }
+        if (mSoftInputHeight <= 0) {
+            mSoftInputHeight = mSp.getInt(SHARE_PREFERENCE_SOFT_INPUT_HEIGHT, 797);
+        }
+        hideSoftInput();
+        mFunctionView.getLayoutParams().height = mSoftInputHeight;
+        mFunctionView.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * 隐藏所有布局
+     */
+    private void hideAllView(){
+        if (mEmotionView != null && mEmotionView.isShown())
+            mEmotionView.setVisibility(View.GONE);
+        if (mFunctionView != null && mFunctionView.isShown())
+            mFunctionView.setVisibility(View.GONE);
+    }
+
+    /**
+     * 隐藏表情布局
+     */
+    private void hideEmotionLayout() {
+        if (mEmotionView != null && mEmotionView.isShown())
+            mEmotionView.setVisibility(View.GONE);
+    }
+
+    /**
+     * 隐藏功能布局
+     */
+    private void hideFunctionLayout() {
+        if (mFunctionView != null && mFunctionView.isShown())
+            mFunctionView.setVisibility(View.GONE);
     }
 
     /**

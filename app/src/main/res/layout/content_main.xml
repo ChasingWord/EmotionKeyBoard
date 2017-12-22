@@ -19,10 +19,22 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="58dp"
-            android:background="@android:color/darker_gray">
+            android:background="#ddd">
 
             <ImageButton
-                android:id="@+id/ib"
+                android:src="@mipmap/icon_submit_black"
+                android:background="@android:color/transparent"
+                android:id="@+id/ib_emotion"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_centerVertical="true"/>
+
+            <ImageButton
+                android:visibility="gone"
+                android:background="@android:color/transparent"
+                android:layout_toRightOf="@id/ib_emotion"
+                android:src="@mipmap/icon_versions_black"
+                android:id="@+id/ib_function"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_centerVertical="true"/>
@@ -32,7 +44,7 @@
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_toRightOf="@id/ib"/>
+                android:layout_toRightOf="@id/ib_function"/>
 
             <Button
                 android:id="@+id/send"
@@ -45,10 +57,18 @@
 
         <!-- 键盘布局 -->
         <com.example.emotionkeyboard.EmotionKeyboardLayout
-            android:visibility="gone"
             android:id="@+id/emotion_keyboard_layout"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:visibility="gone"/>
+
+        <LinearLayout
+            android:id="@+id/function_keyboard_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/holo_red_light"
+            android:orientation="horizontal"
+            android:visibility="gone"/>
 
     </LinearLayout>
 

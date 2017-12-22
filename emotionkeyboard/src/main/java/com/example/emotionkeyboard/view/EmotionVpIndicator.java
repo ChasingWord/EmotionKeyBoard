@@ -74,6 +74,11 @@ public class EmotionVpIndicator extends LinearLayout {
         setLayoutParams(layoutParams);
     }
 
+    /**
+     * 只有在修改了本地表情之后才需要调用此方法:
+     * 重新设置表情资源并且使viewpager显示“other”栏表情
+     * “other”为添加的本地表情一栏
+     */
     public void resetEmotionEntity(List<EmotionEntity> emotionEntities){
         mEmotionEntities = emotionEntities;
         play("other");

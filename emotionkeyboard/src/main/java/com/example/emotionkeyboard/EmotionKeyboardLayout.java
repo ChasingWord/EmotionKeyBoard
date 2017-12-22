@@ -23,6 +23,7 @@ import com.example.emotionkeyboard.view.EmotionFragment;
 import com.example.emotionkeyboard.view.EmotionTitleAdapter;
 import com.example.emotionkeyboard.view.EmotionVpAdapter;
 import com.example.emotionkeyboard.view.EmotionVpIndicator;
+import com.example.emotionkeyboard.view.MyViewPager;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -110,7 +111,7 @@ import static com.example.emotionkeyboard.view.EmotionFragment.getInstance;
  * EmotionKeyboardLayout布局在最下面
  */
 public class EmotionKeyboardLayout extends ViewGroup {
-    private ViewPager mVpEmotion;
+    private MyViewPager mVpEmotion;
     private RecyclerView mRcvEmotionTitle;
     private EmotionVpIndicator mVpIndicator;
 
@@ -144,9 +145,9 @@ public class EmotionKeyboardLayout extends ViewGroup {
 
     private void init() {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.emotion_keyboard, this);
-        mRcvEmotionTitle = (RecyclerView) view.findViewById(R.id.rcv_emotion_title);
-        mVpIndicator = (EmotionVpIndicator) view.findViewById(R.id.vp_indicator);
-        mVpEmotion = (ViewPager) view.findViewById(R.id.vp_emotion);
+        mRcvEmotionTitle = view.findViewById(R.id.rcv_emotion_title);
+        mVpIndicator = view.findViewById(R.id.vp_indicator);
+        mVpEmotion = view.findViewById(R.id.vp_emotion);
 
         emotionEntities = new ArrayList<>();
         mVpFragments = new ArrayList<>();
@@ -252,6 +253,7 @@ public class EmotionKeyboardLayout extends ViewGroup {
      *
      * @param isEmotion          是否是表情 true为表情 false为图片
      * @param title              表情标签主题
+     * @param titleIconId        表情标签主题的图标Id
      * @param emotionMap         表情集合
      * @param onClickPicListener 图片的点击事件，表情的话传null
      */
@@ -376,10 +378,6 @@ public class EmotionKeyboardLayout extends ViewGroup {
     /**
      * 创建一页表情的实例
      */
-    private EmotionEntity createEmotionEntity(String title, int titleIconId, int childCount, boolean isEmotion) {
-        return createEmotionEntity(title, titleIconId, childCount, isEmotion, null);
-    }
-
     private EmotionEntity createEmotionEntity(String title, int titleIconId, int childCount, boolean isEmotion,
                                               OnClickPicListener onClickPicListener) {
         return createEmotionEntity(title, titleIconId, childCount, isEmotion, false, onClickPicListener, null);

@@ -10,6 +10,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 
 import com.example.emotionkeyboard.EmotionKeyboardLayout;
 import com.example.emotionkeyboard.util.EmotionKeyboardManager;
@@ -23,11 +24,13 @@ import java.util.Map;
 public class MainActivity extends FragmentActivity {
 
     private RecyclerView mRcvContent;
-    private ImageButton mIbChangeEmotion;
+    private ImageButton mIbEmotion;
+    private ImageButton mIbFunction;
     private EditText mEtInput;
     private Button mSend;
 
     private EmotionKeyboardLayout mEmotionKeyboardLayout;
+    private LinearLayout mFunctionKeyboardLayout;
 
     private ChatListAdapter mChatListAdapter;
 
@@ -37,17 +40,21 @@ public class MainActivity extends FragmentActivity {
         setContentView(R.layout.activity_main);
 
         mEmotionKeyboardLayout = (EmotionKeyboardLayout) findViewById(R.id.emotion_keyboard_layout);
+        mFunctionKeyboardLayout = (LinearLayout) findViewById(R.id.function_keyboard_layout);
         mRcvContent = (RecyclerView) findViewById(R.id.rl_content);
-        mIbChangeEmotion = (ImageButton) findViewById(R.id.ib);
+        mIbEmotion = (ImageButton) findViewById(R.id.ib_emotion);
+        mIbFunction = (ImageButton) findViewById(R.id.ib_function);
         mEtInput = (EditText) findViewById(R.id.et_input);
         mSend = (Button) findViewById(R.id.send);
 
         // 一、初始化键盘管理类
         EmotionKeyboardManager.with(this)
                 .setEmotionView(mEmotionKeyboardLayout)
+//                .setFunctionView(mFunctionKeyboardLayout)
                 .bindToContent(mRcvContent)
                 .bindToEditText(mEtInput)
-                .bindToEmotionButton(mIbChangeEmotion)
+                .bindToEmotionButton(mIbEmotion)
+                .bindToFunctionButton(mIbFunction)
                 .build();
 
         // 二、初始化数据源
