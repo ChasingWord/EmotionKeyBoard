@@ -38,6 +38,7 @@ import java.util.ArrayList;
 
 /**
  * Created by chasing on 2017/12/18.
+ * 本地图片管理界面
  */
 public class LocalPicManagerActivity extends BaseActivity {
     public static final int REQUEST_CODE_SELECT_PIC = 1;
@@ -46,6 +47,7 @@ public class LocalPicManagerActivity extends BaseActivity {
     private ImageButton mIbBack;
     private TextView mTvManager;
     private ManagerAdapter mManagerAdapter;
+
 
     private boolean hadChange;
 
@@ -98,6 +100,8 @@ public class LocalPicManagerActivity extends BaseActivity {
         mTvManager.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                mManagerAdapter.setManage(!mManagerAdapter.isManage());
+                mManagerAdapter.notifyDataSetChanged();
             }
         });
     }
@@ -118,6 +122,12 @@ public class LocalPicManagerActivity extends BaseActivity {
                         startActivityForResult(intent, REQUEST_CODE_SELECT_PIC);
                     }
                 }
+            }
+        });
+        mManagerAdapter.setOnClickDeletePicListener(new ManagerAdapter.OnClickDeletePicListener() {
+            @Override
+            public void onClickDelete() {
+                hadChange = true;
             }
         });
     }

@@ -1,8 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ImageView
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/iv_emotion"
     android:layout_width="match_parent"
-    android:padding="5dp"
-    android:layout_height="wrap_content"
-    android:scaleType="centerInside"/>
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/iv_emotion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:scaleType="centerInside"/>
+
+    <ImageButton
+        android:id="@+id/ib_delete"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="right"
+        android:background="@android:color/transparent"
+        android:scaleType="centerCrop"
+        android:src="@mipmap/ic_delete"
+        android:visibility="gone"/>
+</FrameLayout>

@@ -152,8 +152,7 @@ public abstract class BaseRecyclerAdapter<T, H extends RecyclerViewHelper> exten
     public void add(T elem) {
         if (elem != null) {
             int index = datas.size();
-            datas.add(elem);
-            notifyItemInserted(index);
+            add(index, elem);
         }
     }
 
@@ -169,7 +168,6 @@ public abstract class BaseRecyclerAdapter<T, H extends RecyclerViewHelper> exten
 
     public void addAll(List<T> elem) {
         if (elem != null && !elem.isEmpty()) {
-            int index = datas.size();
             datas.addAll(elem);
             notifyDataSetChanged();
         }
@@ -225,6 +223,10 @@ public abstract class BaseRecyclerAdapter<T, H extends RecyclerViewHelper> exten
 
     public T getItem(int position) {
         return datas.get(position);
+    }
+
+    public List<T> getAll(){
+        return datas;
     }
 
     @Override

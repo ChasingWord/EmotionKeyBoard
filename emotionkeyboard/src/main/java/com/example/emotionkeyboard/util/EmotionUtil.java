@@ -83,20 +83,22 @@ public class EmotionUtil {
         EMOTION_CLASSIC_MAP3.put("[我19]", R.mipmap.ic_launcher_round);
 
         EMOTION_CLASSIC_MAP4 = new LinkedHashMap<>();
-        EMOTION_CLASSIC_MAP4.put("[gif1]", R.mipmap.gif1);
-        EMOTION_CLASSIC_MAP4.put("[gif2]", R.mipmap.gif2);
-        EMOTION_CLASSIC_MAP4.put("[gif3]", R.mipmap.gif3);
-        EMOTION_CLASSIC_MAP4.put("[gif4]", R.mipmap.gif4);
-        EMOTION_CLASSIC_MAP4.put("[gif5]", R.mipmap.gif5);
+        EMOTION_CLASSIC_MAP4.put("[我40]", R.mipmap.ic_launcher_round);
+//        EMOTION_CLASSIC_MAP4.put("[gif1]", R.mipmap.gif1);
+//        EMOTION_CLASSIC_MAP4.put("[gif2]", R.mipmap.gif2);
+//        EMOTION_CLASSIC_MAP4.put("[gif3]", R.mipmap.gif3);
+//        EMOTION_CLASSIC_MAP4.put("[gif4]", R.mipmap.gif4);
+//        EMOTION_CLASSIC_MAP4.put("[gif5]", R.mipmap.gif5);
     }
 
     /**
      * 根据名称获取当前表情图标R值
+     * 表情map需要写入此方法，图片map不需要
      *
      * @param imgName 名称
      * @return resId
      */
-    public static int getImgByName(String imgName) {
+    private static int getImgByName(String imgName) {
         Integer integer = EMOTION_CLASSIC_MAP1.get(imgName);
         if (integer == null) {
             integer = EMOTION_CLASSIC_MAP2.get(imgName);

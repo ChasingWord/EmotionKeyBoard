@@ -1,7 +1,7 @@
 package com.example.emotionkeyboard.view;
 
+import android.app.Activity;
 import android.app.Dialog;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -13,8 +13,7 @@ import com.example.emotionkeyboard.R;
 /**
  * Created by chasing on 2017/12/19.
  */
-
-public class BaseActivity extends AppCompatActivity {
+public class BaseActivity extends Activity {
     protected Dialog mLoadingDialog;
 
     protected void showLoading(String loadingContent) {
@@ -31,7 +30,7 @@ public class BaseActivity extends AppCompatActivity {
                 window.setAttributes(attributes);
             }
         }
-        TextView tvContent = mLoadingDialog.findViewById(R.id.loading_content);
+        TextView tvContent = (TextView) mLoadingDialog.findViewById(R.id.loading_content);
         tvContent.setText(loadingContent);
         mLoadingDialog.show();
     }

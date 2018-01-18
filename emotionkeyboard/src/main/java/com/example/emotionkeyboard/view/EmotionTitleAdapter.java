@@ -18,6 +18,10 @@ public class EmotionTitleAdapter extends RecyclerQuickAdapter<Map<String, String
     public static final String ICON = "icon";
 
     private int mSelectPosition;
+    private int mNormalBackgroundId = android.R.color.transparent;
+    private int mSelectedBackgroundId = android.R.color.darker_gray;
+    private int mNormalBackground = 0;
+    private int mSelectedBackground = 0;
 
     public EmotionTitleAdapter(Context context, int layoutId) {
         super(context, layoutId);
@@ -32,12 +36,34 @@ public class EmotionTitleAdapter extends RecyclerQuickAdapter<Map<String, String
         notifyItemChanged(position);
     }
 
+    public void setNormalBackgroundId(int normalBackgroundId) {
+        mNormalBackgroundId = normalBackgroundId;
+    }
+
+    public void setSelectedBackgroundId(int selectedBackgroundId) {
+        mSelectedBackgroundId = selectedBackgroundId;
+    }
+
+    public void setNormalBackground(int normalBackground) {
+        mNormalBackground = normalBackground;
+    }
+
+    public void setSelectedBackground(int selectedBackground) {
+        mSelectedBackground = selectedBackground;
+    }
+
     @Override
     protected void convert(int viewType, RecyclerViewHelper helper, Map<String, String> map) {
         if (helper.getPosition() == mSelectPosition) {
-            helper.setBackgroundColor(R.id.ll_emotion_title_container, ContextCompat.getColor(context, android.R.color.darker_gray));
+            if (mSelectedBackground != 0)
+                helper.setBackgroundColor(R.id.ll_emotion_title_container, mSelectedBackground);
+            else
+                helper.setBackgroundColor(R.id.ll_emotion_title_container, ContextCompat.getColor(context, mSelectedBackgroundId));
         } else {
-            helper.setBackgroundColor(R.id.ll_emotion_title_container, ContextCompat.getColor(context, android.R.color.transparent));
+            if (mNormalBackground != 0)
+                helper.setBackgroundColor(R.id.ll_emotion_title_container, mNormalBackground);
+            else
+                helper.setBackgroundColor(R.id.ll_emotion_title_container, ContextCompat.getColor(context, mNormalBackgroundId));
         }
         try {
             int iconId = Integer.valueOf(map.get(ICON));

@@ -2,10 +2,6 @@ package com.example.emotionkeyboard.view;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
-import android.view.ViewGroup;
 
 import com.example.emotionkeyboard.adapter.FragmentPageAdapter;
 
@@ -15,7 +11,7 @@ import java.util.List;
  * Created by chasing on 2017/9/15.
  * ViewPager切换的Adapter
  */
-public class EmotionVpAdapter extends FragmentPagerAdapter {
+public class EmotionVpAdapter extends FragmentPageAdapter {
     private List<Fragment> datas;
     private FragmentManager fm;
     private int mChildCount = 0;

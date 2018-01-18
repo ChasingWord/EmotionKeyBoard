@@ -31,7 +31,7 @@ public class FileUtil {
     private static ExecutorService mThreadExecutor;
 
     /**
-     * 初始化文件夹
+     * 在app进行初始化文件夹
      */
     public static void initFile(Context ctx) {
         File BASE_PATH_FILE;
@@ -170,7 +170,6 @@ public class FileUtil {
             return;
         }
 
-        final String finalSaveName = saveName;
         mThreadExecutor.execute(new Runnable() {
             @Override
             public void run() {
@@ -203,5 +202,11 @@ public class FileUtil {
                 }
             }
         });
+    }
+
+    public static void deleteLocalPicFile(String path){
+        File file = new File(path);
+        if (!file.exists()) return;
+        file.delete();
     }
 }

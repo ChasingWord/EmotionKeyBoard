@@ -8,6 +8,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.util.Linkify;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
@@ -221,6 +222,62 @@ public class RecyclerViewHelper {
 		TextView view = retrieveView(viewId);
 		view.setMaxEms(length);
 		return this;
+	}
+
+	public RecyclerViewHelper setMarginTop(int viewId, int margin) {
+		View v = retrieveView(viewId);
+		if (v.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
+			ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
+			layoutParams.topMargin = margin;
+			v.setLayoutParams(layoutParams);
+		} else {
+			Log.e("RecyclerHelper", "This LayoutParams is not instanceof ViewGroup.MarginLayoutParams");
+		}
+		return this;
+	}
+
+	public RecyclerViewHelper setPaddingLeft(int viewId, int paddingLeft) {
+		View v = retrieveView(viewId);
+		int paddingTop = v.getPaddingTop();
+		int paddingRight = v.getPaddingRight();
+		int paddingBottom = v.getPaddingBottom();
+		v.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
+		return this;
+	}
+
+	public RecyclerViewHelper setPaddingTop(int viewId, int paddingTop) {
+		View v = retrieveView(viewId);
+		int paddingLeft = v.getPaddingLeft();
+		int paddingRight = v.getPaddingRight();
+		int paddingBottom = v.getPaddingBottom();
+		v.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
+		return this;
+	}
+
+	public RecyclerViewHelper setPaddingRight(int viewId, int paddingRight) {
+		View v = retrieveView(viewId);
+		int paddingLeft = v.getPaddingLeft();
+		int paddingTop = v.getPaddingTop();
+		int paddingBottom = v.getPaddingBottom();
+		v.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
+		return this;
+	}
+
+	public RecyclerViewHelper setPaddingBottom(int viewId, int paddingBottom) {
+		View v = retrieveView(viewId);
+		int paddingLeft = v.getPaddingLeft();
+		int paddingTop = v.getPaddingTop();
+		int paddingRight = v.getPaddingRight();
+		v.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
+		return this;
+	}
+
+	public int getHeight(int viewId) {
+		View v = retrieveView(viewId);
+		int w = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+		int h = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+		v.measure(w, h);
+		return v.getMeasuredHeight();
 	}
 
 	public View getView() {

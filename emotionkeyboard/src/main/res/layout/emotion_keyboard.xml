@@ -3,8 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/rl_emotion_keyboard"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="#dddddd">
+    android:layout_height="wrap_content">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rcv_emotion_title"
@@ -21,7 +20,7 @@
 
     <com.example.emotionkeyboard.view.EmotionVpIndicator
         android:id="@+id/vp_indicator"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/divider_line"
         android:layout_centerHorizontal="true"/>

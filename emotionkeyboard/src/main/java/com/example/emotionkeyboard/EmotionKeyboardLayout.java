@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 
 import com.example.emotionkeyboard.adapter.recycleradaper.BaseRecyclerAdapter;
 import com.example.emotionkeyboard.decoration.FlexibleDividerDecoration;
@@ -23,9 +24,11 @@ import com.example.emotionkeyboard.view.EmotionFragment;
 import com.example.emotionkeyboard.view.EmotionTitleAdapter;
 import com.example.emotionkeyboard.view.EmotionVpAdapter;
 import com.example.emotionkeyboard.view.EmotionVpIndicator;
+import com.example.emotionkeyboard.view.FixedSpeedScroller;
 import com.example.emotionkeyboard.view.MyViewPager;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -111,6 +114,7 @@ import static com.example.emotionkeyboard.view.EmotionFragment.getInstance;
  * EmotionKeyboardLayout布局在最下面
  */
 public class EmotionKeyboardLayout extends ViewGroup {
+    private RelativeLayout mRootView;
     private MyViewPager mVpEmotion;
     private RecyclerView mRcvEmotionTitle;
     private EmotionVpIndicator mVpIndicator;
@@ -145,9 +149,10 @@ public class EmotionKeyboardLayout extends ViewGroup {
 
     private void init() {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.emotion_keyboard, this);
-        mRcvEmotionTitle = view.findViewById(R.id.rcv_emotion_title);
-        mVpIndicator = view.findViewById(R.id.vp_indicator);
-        mVpEmotion = view.findViewById(R.id.vp_emotion);
+        mRootView = (RelativeLayout) view.findViewById(R.id.rl_emotion_keyboard);
+        mRcvEmotionTitle = (RecyclerView) view.findViewById(R.id.rcv_emotion_title);
+        mVpIndicator = (EmotionVpIndicator) view.findViewById(R.id.vp_indicator);
+        mVpEmotion = (MyViewPager) view.findViewById(R.id.vp_emotion);
 
         emotionEntities = new ArrayList<>();
         mVpFragments = new ArrayList<>();
@@ -226,6 +231,7 @@ public class EmotionKeyboardLayout extends ViewGroup {
             throw new IllegalArgumentException("Please call createEmotionFragment() method first!");
         mFragmentManager = fragmentManager;
         mEmotionVpAdapter = new EmotionVpAdapter(fragmentManager, mVpFragments);
+//        mEmotionVpAdapter = new EmotionVpAdapter(fragmentManager, new ArrayList<Fragment>());
         mVpEmotion.setAdapter(mEmotionVpAdapter);
         mVpIndicator.bindViewPager(mVpEmotion, emotionEntities, mEmotionTitles);
         mEmotionTitleAdapter.addAll(mEmotionTitleWithIcon);
@@ -246,6 +252,16 @@ public class EmotionKeyboardLayout extends ViewGroup {
 
             }
         });
+
+        try {
+            //设置ViewPager的页面切换速度为0，避免间隔较大的页面跳转产生问题
+            Field mScroller = ViewPager.class.getDeclaredField("mScroller");
+            mScroller.setAccessible(true);
+            FixedSpeedScroller scroller = new FixedSpeedScroller(getContext());
+            mScroller.set(mVpEmotion, scroller);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -404,5 +420,70 @@ public class EmotionKeyboardLayout extends ViewGroup {
         mVpFragments.add(instance);
         emotionEntities.add(entity);
         return entity;
+    }
+
+    //-------------------以下为属性设置----------------------
+    // 资源id形式
+    public EmotionKeyboardLayout setWholeBackgroundResId(int resId){
+        mRootView.setBackgroundResource(resId);
+        return this;
+    }
+
+    public EmotionKeyboardLayout setVpBackgroundResId(int resId){
+        mVpEmotion.setBackgroundResource(resId);
+        mVpIndicator.setBackgroundResource(resId);
+        return this;
+    }
+
+    public EmotionKeyboardLayout setEmotionTitleBackgroundResId(int resId){
+        mRcvEmotionTitle.setBackgroundResource(resId);
+        return this;
+    }
+
+    public EmotionKeyboardLayout setEmotionTitleNormalResId(int resId){
+        mEmotionTitleAdapter.setNormalBackgroundId(resId);
+        return this;
+    }
+
+    public EmotionKeyboardLayout setEmotionTitleSelectedResId(int resId){
+        mEmotionTitleAdapter.setSelectedBackgroundId(resId);
+        return this;
+    }
+
+    public EmotionKeyboardLayout setIndicatorNormalResId(int resId){
+        mVpIndicator.setNormalIconId(resId);
+        return this;
+    }
+
+    public EmotionKeyboardLayout setIndicatorSelectedResId(int resId){
+        mVpIndicator.setSelectedIconId(resId);
+        return this;
+    }
+
+    // 数值形式
+    public EmotionKeyboardLayout setWholeBackground(int color){
+        mRootView.setBackgroundColor(color);
+        return this;
+    }
+
+    public EmotionKeyboardLayout setVpBackground(int color){
+        mVpEmotion.setBackgroundColor(color);
+        mVpIndicator.setBackgroundColor(color);
+        return this;
+    }
+
+    public EmotionKeyboardLayout setEmotionTitleBackground(int color){
+        mRcvEmotionTitle.setBackgroundColor(color);
+        return this;
+    }
+
+    public EmotionKeyboardLayout setEmotionTitleNormal(int color){
+        mEmotionTitleAdapter.setNormalBackground(color);
+        return this;
+    }
+
+    public EmotionKeyboardLayout setEmotionTitleSelected(int color){
+        mEmotionTitleAdapter.setSelectedBackground(color);
+        return this;
     }
 }

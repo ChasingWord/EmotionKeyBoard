@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Rect;
 import android.os.Build;
+import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -15,22 +16,35 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import com.example.emotionkeyboard.EmotionKeyboardLayout;
+
 /**
  * Created by chasing on 2017/9/14.
  * 表情键盘的控制器
+ * 如果使用的样式主题包含 notitle，则主题需要继承AppCompat
+ * <p>
+ * todo bug:底部虚拟按钮隐藏的话会出现问题
  */
 public class EmotionKeyboardManager {
     private static final String SHARE_PREFERENCE_SOFT_INPUT_HEIGHT = "softInputHeight";
     private static final String SHARE_PREFERENCE_NAME = "emotionKeyboard";
     private View mContentView;
-    private View mEmotionView;
+    private EmotionKeyboardLayout mEmotionView;
     private View mFunctionView;
+    private View mRecyclerView;
     private Activity mActivity;
     private EditText mEtInput;
     private InputMethodManager mInputMethodManager;
     private SharedPreferences mSp;
 
     private int mSoftInputHeight;
+    private long preClickTime;
+
+    /*
+    按钮之间的切换点击时间间隔至少在 CLICK_INTERVAL_TIME ms以上
+    避免快速切换导致跳闪
+     */
+    private static final int CLICK_INTERVAL_TIME = 200;
 
     private EmotionKeyboardManager() {
     }
@@ -54,12 +68,50 @@ public class EmotionKeyboardManager {
         mContentView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
+                ((LinearLayout.LayoutParams) mContentView.getLayoutParams()).weight = 1.0F;
                 hideSoftInput();
                 hideAllView();
                 return false;
             }
         });
         return this;
+    }
+
+    /**
+     * 当RecyclerView外层包裹着刷新布局的话：
+     * 刷新布局作为contentView，会失去点击等一系列事件，所以需要将事件放到RecyclerView
+     * 如果contentView就是RecyclerView等滚动布局的话，就无需设置此项
+     */
+    public EmotionKeyboardManager bindToRecycler(View rcvView) {
+        mRecyclerView = rcvView;
+        mRecyclerView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                ((LinearLayout.LayoutParams) mContentView.getLayoutParams()).weight = 1.0F;
+                hideSoftInput();
+                hideAllView();
+                return false;
+            }
+        });
+        return this;
+    }
+
+    /**
+     * 滚动到列表最后一项
+     */
+    private void scrollToLastPosition() {
+        RecyclerView rcv = null;
+        if (mContentView instanceof RecyclerView) {
+            rcv = (RecyclerView) mContentView;
+        } else if (mRecyclerView != null) {
+            rcv = (RecyclerView) mRecyclerView;
+        }
+        if (rcv != null) {
+            RecyclerView.Adapter adapter = rcv.getAdapter();
+            if (adapter.getItemCount() > 0) {
+                rcv.scrollToPosition(adapter.getItemCount() - 1);
+            }
+        }
     }
 
     /**
@@ -71,18 +123,18 @@ public class EmotionKeyboardManager {
         mEtInput.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (motionEvent.getAction() == MotionEvent.ACTION_UP && mEmotionView.isShown()) {
+                preClickTime = System.currentTimeMillis();
+                if (motionEvent.getAction() == MotionEvent.ACTION_UP && (mEmotionView.isShown() || (mFunctionView != null && mFunctionView.isShown()))) {
+                    // 表情或者功能布局正在显示时：
+                    scrollToLastPosition();
                     lockContentHeight();//显示软件盘时，锁定内容高度，防止跳闪。
-                    hideEmotionLayout();//隐藏表情布局，显示软件盘
+                    hideEmotionLayout();
                     hideFunctionLayout();
                     showSoftInput();
-                    //软件盘显示后，释放内容高度
-                    mEtInput.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            unlockContentHeightDelayed();
-                        }
-                    }, 200L);
+                    unlockContentHeightDelayed();
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP && !isSoftInputShown()) {
+                    showSoftInput();
+                    scrollToLastPosition();
                 }
                 return false;
             }
@@ -97,6 +149,12 @@ public class EmotionKeyboardManager {
         emotionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                scrollToLastPosition();
+
+                long curTime = System.currentTimeMillis();
+                if (curTime - preClickTime < CLICK_INTERVAL_TIME)
+                    return;
+                preClickTime = curTime;
                 if (mEmotionView.isShown()) {
                     lockContentHeight();//显示软件盘时，锁定内容高度，防止跳闪。
                     hideEmotionLayout();//隐藏表情布局，显示软件盘
@@ -124,7 +182,14 @@ public class EmotionKeyboardManager {
         functionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mFunctionView == null) throw new NullPointerException("FunctionView must not be null");
+                scrollToLastPosition();
+
+                long curTime = System.currentTimeMillis();
+                if (curTime - preClickTime < CLICK_INTERVAL_TIME)
+                    return;
+                preClickTime = curTime;
+                if (mFunctionView == null)
+                    throw new NullPointerException("FunctionView must not be null");
                 if (mFunctionView.isShown()) {
                     lockContentHeight();//显示软件盘时，锁定内容高度，防止跳闪。
                     hideFunctionLayout();//隐藏表情布局，显示软件盘
@@ -148,7 +213,7 @@ public class EmotionKeyboardManager {
     /**
      * 设置表情内容布局
      */
-    public EmotionKeyboardManager setEmotionView(View emotionView) {
+    public EmotionKeyboardManager setEmotionView(EmotionKeyboardLayout emotionView) {
         mEmotionView = emotionView;
         return this;
     }
@@ -157,6 +222,7 @@ public class EmotionKeyboardManager {
      * 设置功能键盘
      */
     public EmotionKeyboardManager setFunctionView(View functionView) {
+        if (functionView == null) throw new NullPointerException("FunctionView must not be null");
         mFunctionView = functionView;
         return this;
     }
@@ -186,12 +252,7 @@ public class EmotionKeyboardManager {
      * 展示表情布局
      */
     private void showEmotionLayout() {
-        if (mSoftInputHeight <= 0) {
-            mSoftInputHeight = getSupportSoftInputHeight();
-        }
-        if (mSoftInputHeight <= 0) {
-            mSoftInputHeight = mSp.getInt(SHARE_PREFERENCE_SOFT_INPUT_HEIGHT, 797);
-        }
+        measureSoftInputHeight();
         hideSoftInput();
         mEmotionView.getLayoutParams().height = mSoftInputHeight;
         mEmotionView.setVisibility(View.VISIBLE);
@@ -201,21 +262,30 @@ public class EmotionKeyboardManager {
      * 展示功能布局
      */
     private void showFunctionLayout() {
-        if (mSoftInputHeight <= 0) {
-            mSoftInputHeight = getSupportSoftInputHeight();
-        }
-        if (mSoftInputHeight <= 0) {
-            mSoftInputHeight = mSp.getInt(SHARE_PREFERENCE_SOFT_INPUT_HEIGHT, 797);
-        }
+        if (mFunctionView == null) return;
+        measureSoftInputHeight();
         hideSoftInput();
         mFunctionView.getLayoutParams().height = mSoftInputHeight;
         mFunctionView.setVisibility(View.VISIBLE);
     }
 
     /**
+     * 显示布局之前测量软键盘高度
+     * 仅进行一次测量，之后一直返回首次测量值
+     */
+    private void measureSoftInputHeight() {
+        if (mSoftInputHeight <= 0) {
+            mSoftInputHeight = getSupportSoftInputHeight();
+        }
+        if (mSoftInputHeight <= 0) {
+            mSoftInputHeight = mSp.getInt(SHARE_PREFERENCE_SOFT_INPUT_HEIGHT, 797);
+        }
+    }
+
+    /**
      * 隐藏所有布局
      */
-    private void hideAllView(){
+    private void hideAllView() {
         if (mEmotionView != null && mEmotionView.isShown())
             mEmotionView.setVisibility(View.GONE);
         if (mFunctionView != null && mFunctionView.isShown())
@@ -249,6 +319,7 @@ public class EmotionKeyboardManager {
 
     /**
      * 释放被锁定的内容高度
+     * 软件盘显示后，释放内容高度，避免软键盘还没有显示完全,进行延迟1s
      */
     private void unlockContentHeightDelayed() {
         mEtInput.postDelayed(new Runnable() {
@@ -256,7 +327,7 @@ public class EmotionKeyboardManager {
             public void run() {
                 ((LinearLayout.LayoutParams) mContentView.getLayoutParams()).weight = 1.0F;
             }
-        }, 200L);
+        }, 100);
     }
 
     /**
@@ -283,7 +354,7 @@ public class EmotionKeyboardManager {
      * 是否显示软件盘
      */
     private boolean isSoftInputShown() {
-        return getSupportSoftInputHeight() != 0;
+        return getSupportSoftInputHeight() > 0;
     }
 
     /**
@@ -315,10 +386,13 @@ public class EmotionKeyboardManager {
         //存一份到本地
         if (softInputHeight > 0) {
             mSp.edit().putInt(SHARE_PREFERENCE_SOFT_INPUT_HEIGHT, softInputHeight).apply();
+            mSoftInputHeight = softInputHeight;
+        } else {
+            //不返回负数
+            softInputHeight = 0;
         }
         return softInputHeight;
     }
-
 
     /**
      * 底部虚拟按键栏的高度

@@ -103,7 +103,7 @@ public class EmotionFragment extends Fragment {
 
     private void initView(View rootView) {
         mEmotionPopup = new EmotionPopup(getActivity());
-        mRcvEmotion = rootView.findViewById(R.id.rcv_emotion);
+        mRcvEmotion = (RecyclerView) rootView.findViewById(R.id.rcv_emotion);
         int rowCount;
         if (mEmotionEntity.isEmotionIcon()) {
             rowCount = ROW_COUNT_EMOTION;

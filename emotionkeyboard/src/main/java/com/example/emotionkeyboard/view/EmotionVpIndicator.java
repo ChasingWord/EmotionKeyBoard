@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -14,7 +15,6 @@ import android.widget.RelativeLayout;
 import com.example.emotionkeyboard.R;
 import com.example.emotionkeyboard.entity.EmotionEntity;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,6 +64,15 @@ public class EmotionVpIndicator extends LinearLayout {
         if (mDrawableSelect == null) {
             mDrawableSelect = ContextCompat.getDrawable(getContext(), R.mipmap.indicator_point_select);
         }
+        setGravity(Gravity.CENTER);
+    }
+
+    public void setSelectedIconId(int selectedIconId) {
+        mDrawableSelect = ContextCompat.getDrawable(getContext(), selectedIconId);
+    }
+
+    public void setNormalIconId(int normalIconId) {
+        mDrawableNormal = ContextCompat.getDrawable(getContext(), normalIconId);
     }
 
     @Override
@@ -79,7 +88,7 @@ public class EmotionVpIndicator extends LinearLayout {
      * 重新设置表情资源并且使viewpager显示“other”栏表情
      * “other”为添加的本地表情一栏
      */
-    public void resetEmotionEntity(List<EmotionEntity> emotionEntities){
+    public void resetEmotionEntity(List<EmotionEntity> emotionEntities) {
         mEmotionEntities = emotionEntities;
         play("other");
     }
@@ -119,16 +128,6 @@ public class EmotionVpIndicator extends LinearLayout {
 
             }
         });
-
-        try {
-            //设置ViewPager的页面切换速度为0，避免间隔较大的页面跳转产生问题
-            Field mScroller = ViewPager.class.getDeclaredField("mScroller");
-            mScroller.setAccessible(true);
-            FixedSpeedScroller scroller = new FixedSpeedScroller(mViewPager.getContext());
-            mScroller.set(mViewPager, scroller);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -153,7 +152,7 @@ public class EmotionVpIndicator extends LinearLayout {
         if (mIndicatorViews.size() < themeChildCount) {
             for (int i = mIndicatorViews.size(); i < themeChildCount; i++) {
                 ImageView indicatorView = new ImageView(mContext);
-                indicatorView.setScaleType(ImageView.ScaleType.CENTER);
+                indicatorView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
                 indicatorView.setImageDrawable(mDrawableNormal);
                 LinearLayout.LayoutParams layoutParams = new LayoutParams((int) mIndicatorSide, (int) mIndicatorSide);
                 layoutParams.setMargins((int) mIndicatorMarginLeft, (int) mIndicatorMarginTop, (int) mIndicatorMarginRight, (int) mIndicatorMarginBottom);

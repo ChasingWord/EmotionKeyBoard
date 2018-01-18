@@ -3,13 +3,13 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@android:color/white">
+    android:background="@android:color/white"
+    android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:background="@android:color/holo_red_light">
+        android:background="@color/toolbar_red">
 
         <ImageButton
             android:id="@+id/ib_back"
@@ -27,7 +27,8 @@
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:text="管理"
-            android:textColor="@android:color/white"/>
+            android:textColor="@android:color/white"
+            android:visibility="invisible"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -39,10 +40,15 @@
             android:textColor="@android:color/white"/>
     </RelativeLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rcv_local_pic_manager"
+    <android.support.v4.view.ViewPager
+        android:id="@+id/vp_local_pic_shower"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:overScrollMode="never"/>
-</LinearLayout>
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rcv_local_pic_shower_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+</LinearLayout>
